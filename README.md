@@ -1,6 +1,6 @@
 # Advent of Code
 
-This repository is intended as a framework for writing and running Advent of Code challenge code in Haskell. It uses a lot of code from [samcoy3's template](https://github.com/samcoy3/advent-of-code-template) and adds some utilities to automatically generate files for test code.
+This repository is intended as a framework for writing and running Advent of Code challenge code in Haskell. I started with an empty repo then realized [samcoy3's template](https://github.com/samcoy3/advent-of-code-template) had a lot of what I wanted to do, so I created this as a fork, though it also adds some utilities to automatically generate files for test code.
 
 ## Setup
 
