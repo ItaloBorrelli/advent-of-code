@@ -47,17 +47,34 @@ if [ ! -f $SOLUTION_FILE ]; then
     fi
 fi
 
+echo
+
 MAIN_FILE="app/Main.hs"
 IMPORT_STATEMENT="import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
-if ! grep -q "$IMPORT_STATEMENT" "$MAIN_FILE"; then
-    sed -i "/--- Day imports/a $IMPORT_STATEMENT" "$MAIN_FILE"
+IMPORT_PREFIX=${IMPORT_STATEMENT:0:32}
+if ! grep -q "$IMPORT_PREFIX" "$MAIN_FILE"; then
+    sed -i "/--- Day imports/ { :a; n; /^import /! { s/.*/&$IMPORT_STATEMENT\n/; b }; ba }" "$MAIN_FILE"
     echo "Added import statement to $MAIN_FILE"
+else
+    echo "Matching import statement already exists in $MAIN_FILE"
 fi
 
-echo $'\nIn app/Main.hs add:'
-echo "import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
-echo $'\nIn the days function:'
-echo "(${YEAR}${DAY}, (Y${YEAR}Day${DAY}.runDay, \"inputs/${YEAR}/${DAY}/input\"))"
-echo $'\nIn test/Spec.hs add:'
-echo "it \"${YEAR}${DAY}\" $ do runDay (\"${YEAR}\", \"${DAY}\")"
-echo $'\nThen run stack build.'
+INSERT_STATEMENT="(${YEAR}${DAY}, (Y${YEAR}Day${DAY}.runDay, \"inputs/${YEAR}/${DAY}/input.txt\"))"
+if ! grep -q "$INSERT_STATEMENT" "$MAIN_FILE"; then
+    sed -i -E "s/(input.txt\"\)\))$/\1,/g" "$MAIN_FILE"
+    sed -i "/-- Insert new days here/,/]/ { 
+        /^[[:space:]]*]/ i \      $INSERT_STATEMENT
+    }" "$MAIN_FILE"
+    echo "Added runDay to test list in $MAIN_FILE"
+else
+    echo "Day entry already exists in the list in $MAIN_FILE"
+fi
+
+SPEC_FILE="test/Spec.hs"
+TEST_STATEMENT="it \"${YEAR}${DAY}\" $ do runDay (\"${YEAR}\", \"${DAY}\")"
+if ! grep -q "$TEST_STATEMENT" "$SPEC_FILE"; then
+    sed -i "/-- Add new tests here/ a \    $TEST_STATEMENT" "$SPEC_FILE"
+    echo "Added test entry to $SPEC_FILE"
+else
+    echo "Test entry already exists in the list in $SPEC_FILE"
+fi
