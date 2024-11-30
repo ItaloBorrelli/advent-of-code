@@ -1,10 +1,9 @@
 #!/bin/bash
 
 validate_date() {
-    local year=$1
-    local day=$2
-
     RESULT=0
+    year=$1
+    day=$2
 
     if [[ ! -z $year && ! $year =~ ^[0-9]{4}$ ]]; then
         echo "echo \"Invalid year: $year\""
@@ -12,7 +11,7 @@ validate_date() {
         RESULT=1
     fi
 
-    if [[ ! -z $day && ! $day =~ ^[0-9]{2}$ ]] || (( day < 1 || day > 25 )); then
+    if [[ ! -z $day ]] && [[ ! $day =~ ^[0-9]{2}$ || (( day < 1 || day > 25 )) ]]; then
         echo "echo \"Invalid day: $day\""
         echo "echo \"Must be two digits long and between 01 and 25\""
         RESULT=1
@@ -29,7 +28,11 @@ if [[ -f .env ]]; then
     source .env
 fi
 
-validate_date "$YEAR" "$DAY"
+year=$YEAR
+day=$DAY
+
+validate_date "$year" "$day"
+
 if [[ $? -ne 0 ]]; then
     exit 1
 fi
