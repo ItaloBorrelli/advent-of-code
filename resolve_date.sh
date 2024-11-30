@@ -11,9 +11,9 @@ validate_date() {
         RESULT=1
     fi
 
-    if [[ ! -z $day ]] && [[ ! $day =~ ^[0-9]{2}$ || (( day < 1 || day > 25 )) ]]; then
+    if [[ ! -z $day ]] && [[ ! $day =~ ^[0-9]{2}$ ]]; then
         echo "echo \"Invalid day: $day\""
-        echo "echo \"Must be two digits long and between 01 and 25\""
+        echo "echo \"Must be two digits long\""
         RESULT=1
     fi
 
