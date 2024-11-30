@@ -24,9 +24,11 @@ Then open VS Code and install recommended or desired extensions.
 
 ## Initialize day
 
-To get a day started, run `init_day.sh YYYY DD`. Or `cp .env.example .env` and set the `YEAR` and/or `DATE` value in there. It could be helpful to only set the year and run with the day parameter. In other words, set `export YEAR=20YY` in `.env` then run `init_day.sh DD`. With no day or year set, the current day and will be used, which is useful when doing the challenges on a daily basis.
+To get a day started, run `init_day.sh YYYY DD`. Or `cp .env.example .env` and set the `YEAR` and/or `DATE` value in there. It could be helpful to only set the year and run with the day parameter. In other words, set `export YEAR=20YY` in `.env` then run `init_day.sh DD`. With no day or year set, the current day and year will be used, which is useful when doing the challenges on a daily basis in December.
 
-This creates `input.txt`, `test-answers.txt` and `test-input.txt` files in `inputs/YYYY/DD`, copies a template day as `src/AOC/Y${YYYY}/Day${DD}.hs` and offers recommendations on what to do next so that it is runnable through `stack run -- -d YYYYDD` and `stack test --test-arguments="--match=/AoC/YYYYDD/"`, which are also provided as scripts.
+This creates `input.txt`, `test-answers.txt` and `test-input.txt` files in `inputs/YYYY/DD`, copies a template day as `src/AOC/Y${YYYY}/Day${DD}.hs` and adds lines to `Main.hs` and `Spec.hs` so that it is runnable through `stack run -- -d YYYYDD` and `stack test --test-arguments="--match=/AoC/YYYYDD/"`, which are also provided as scripts.
+
+After that, run `stack build`. You can then put your inputs in the files and start working on the problem.
 
 NOTE: The input files are not tracked, as requested by Eric Wastl on the [Advent of Code about page](https://adventofcode.com/about) (see "Can I copy/redistribute part of Advent of Code?").
 
