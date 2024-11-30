@@ -91,30 +91,23 @@ days =
 formatDay :: Int -> String
 formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)
 
-printDayHeader :: Int -> IO ()
-printDayHeader day = withColor Magenta $ putStrLn $ formatDay day
-
-runDay :: Verbosity -> (Day, String) -> Maybe String -> IO ()
-runDay v (dayFunc, inputFile) input = do
-  let i' = fromMaybe inputFile input
-  _ <- dayFunc v i'
-  withColor Magenta $ putStrLn "************"
-
 performDay :: Options -> IO ()
 performDay (Options d v) = case d of
   AllDays -> do
     results <-
-      let eachDay day dayData = do
-            printDayHeader day
-            runDay v dayData Nothing
+      let eachDay day (dayFunc, inputFile) = do
+            withColor Magenta $ putStrLn $ formatDay day
+            dayFunc v inputFile
        in sequence $ mapWithKey eachDay days
 
     printSummary results
   OneDay {..} -> case days !? day of
     Nothing -> putStrLn "Invalid day provided."
-    Just dayData -> do
-      printDayHeader day
-      runDay v dayData input
+    Just (dayFunc, inputFile) -> do
+      let i' = fromMaybe inputFile input
+      withColor Magenta $ putStrLn $ formatDay day
+      _ <- dayFunc v i'
+      withColor Magenta $ putStrLn "************"
 
 printSummary :: Map Int (Maybe Double, Maybe Double) -> IO ()
 printSummary results = do
