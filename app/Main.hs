@@ -4,6 +4,7 @@
 module Main (main) where
 
 --- Day imports
+import qualified AOC.Y2022.Day01 as Y2022Day01
 
 --- Other imports
 import qualified Control.Applicative.Combinators as C (option)
@@ -86,6 +87,7 @@ days =
   fromList
     [
       -- Insert new days here
+      (202201, (Y2022Day01.runDay, "inputs/2022/01/input.txt"))
     ]
 
 formatDay :: Int -> String
