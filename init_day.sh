@@ -15,6 +15,8 @@ if [[ $confirm != [yY] ]]; then
     exit 1
 fi
 
+echo
+
 INPUT_DIR="inputs/$YEAR/$DAY"
 
 mkdir -p $INPUT_DIR
@@ -38,6 +40,8 @@ if [ ! -f $TEST_INPUT_FILE ]; then
     touch $TEST_INPUT_FILE
     echo "'test-input.txt' created in '$INPUT_DIR'"
 fi
+
+echo
 
 SOLVE_DIR="src/AOC/Y$YEAR"
 SOLVE_FILE_NAME="Day$DAY.hs"
