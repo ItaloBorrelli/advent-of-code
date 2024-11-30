@@ -17,34 +17,38 @@ fi
 
 INPUT_DIR="inputs/$YEAR/$DAY"
 
-read -p "Create 'input.txt', 'test-answers.txt', and 'test-input.txt' files in '$INPUT_DIR'? (y/n) " confirm
+mkdir -p $INPUT_DIR
 
-if [[ $confirm == [yY] ]]; then
-    mkdir -p $INPUT_DIR
+INPUT_FILE = "$INPUT_DIR/input.txt"
+if [ ! -f $INPUT_FILE ]; then
     touch $INPUT_DIR/input.txt
-    TEST_ANSWER_FILE="$INPUT_DIR/test-answers.txt"
-    if [ ! -f $TEST_ANSWER_FILE ]; then
-        touch $TEST_ANSWER_FILE
-        echo "Couldn't run Part A!" >> $TEST_ANSWER_FILE
-        echo "Couldn't run Part B!" >> $TEST_ANSWER_FILE
-    fi
-    touch $INPUT_DIR/test-input.txt
+    echo "'input.txt' created in '$INPUT_DIR'"
+fi
+
+TEST_ANSWER_FILE="$INPUT_DIR/test-answers.txt"
+if [ ! -f $TEST_ANSWER_FILE ]; then
+    touch $TEST_ANSWER_FILE
+    echo "Couldn't run Part A!" >> $TEST_ANSWER_FILE
+    echo "Couldn't run Part B!" >> $TEST_ANSWER_FILE
+    echo "'test-answers.txt' created in '$INPUT_DIR'"
+fi
+
+TEST_INPUT_FILE = "$INPUT_DIR/test-input.txt"
+if [ ! -f $TEST_INPUT_FILE ]; then
+    touch $TEST_INPUT_FILE
+    echo "'test-input.txt' created in '$INPUT_DIR'"
 fi
 
 SOLVE_DIR="src/AOC/Y$YEAR"
 SOLVE_FILE_NAME="Day$DAY.hs"
 SOLUTION_FILE="$SOLVE_DIR/$SOLVE_FILE_NAME"
 if [ ! -f $SOLUTION_FILE ]; then
-    read -p "Create '$SOLVE_FILE_NAME' file in '$SOLVE_DIR'? (y/n) " confirm
-
-    if [[ $confirm == [yY] ]]; then
-        mkdir -p $SOLVE_DIR
-        cp ./Day.hs.template $SOLUTION_FILE
-        sed -i "s/DayXX/Day$DAY/g" $SOLUTION_FILE
-        echo "Created $SOLUTION_FILE"
-    else
-        echo "File already exists."
-    fi
+    mkdir -p $SOLVE_DIR
+    cp ./Day.hs.template $SOLUTION_FILE
+    sed -i "s/DayXX/Day$DAY/g" $SOLUTION_FILE
+    echo "Created $SOLUTION_FILE"
+else
+    echo "Solution file already exists."
 fi
 
 echo
