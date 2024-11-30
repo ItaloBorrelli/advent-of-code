@@ -47,6 +47,13 @@ if [ ! -f $SOLUTION_FILE ]; then
     fi
 fi
 
+MAIN_FILE="app/Main.hs"
+IMPORT_STATEMENT="import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
+if ! grep -q "$IMPORT_STATEMENT" "$MAIN_FILE"; then
+    sed -i "/--- Day imports/a $IMPORT_STATEMENT" "$MAIN_FILE"
+    echo "Added import statement to $MAIN_FILE"
+fi
+
 echo $'\nIn app/Main.hs add:'
 echo "import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
 echo $'\nIn the days function:'
