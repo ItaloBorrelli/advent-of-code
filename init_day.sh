@@ -19,7 +19,7 @@ INPUT_DIR="inputs/$YEAR/$DAY"
 
 mkdir -p $INPUT_DIR
 
-INPUT_FILE = "$INPUT_DIR/input.txt"
+INPUT_FILE="$INPUT_DIR/input.txt"
 if [ ! -f $INPUT_FILE ]; then
     touch $INPUT_DIR/input.txt
     echo "'input.txt' created in '$INPUT_DIR'"
@@ -33,7 +33,7 @@ if [ ! -f $TEST_ANSWER_FILE ]; then
     echo "'test-answers.txt' created in '$INPUT_DIR'"
 fi
 
-TEST_INPUT_FILE = "$INPUT_DIR/test-input.txt"
+TEST_INPUT_FILE="$INPUT_DIR/test-input.txt"
 if [ ! -f $TEST_INPUT_FILE ]; then
     touch $TEST_INPUT_FILE
     echo "'test-input.txt' created in '$INPUT_DIR'"
