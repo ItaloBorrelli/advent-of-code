@@ -6,7 +6,8 @@
 
 module Main (main) where
 
--- Day imports
+--- Day imports
+import qualified AOC.Y2022.Day01 as Y2022Day01
 
 -- Other imports
 import qualified Control.Applicative.Combinators as C (option)
@@ -122,8 +123,8 @@ days =
   fromList
     [
       -- Insert new days here
+      (202201, (Y2022Day01.runDay, "inputs/2022/01/input.txt"))
     ]
-{- FOURMOLU_ENABLE -}
 
 formatDay :: Int -> String
 formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)
