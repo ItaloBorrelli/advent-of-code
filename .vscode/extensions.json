@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "haskell.haskell",
+    "hoovercj.haskell-linter",
+    "vigoo.stylish-haskell",
+    "justusadam.language-haskell",
+    "rutger-de-jong.haskell-interactive",
+    "visortelle.haskell-spotlight"
+  ]
+}

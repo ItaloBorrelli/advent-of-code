@@ -1,0 +1,111 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.37.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           advent-of-code
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/ItaloBorrelli/advent-of-code#readme>
+homepage:       https://github.com/ItaloBorrelli/advent-of-code#readme
+bug-reports:    https://github.com/ItaloBorrelli/advent-of-code/issues
+author:         Italo Borrelli
+maintainer:     iborrelli@protonmail.com
+copyright:      2024 Italo Borrelli
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/ItaloBorrelli/advent-of-code
+
+library
+  exposed-modules:
+      Program.Color
+      Program.RunDay
+      Util.Util
+  other-modules:
+      Paths_advent_of_code
+  autogen-modules:
+      Paths_advent_of_code
+  hs-source-dirs:
+      src
+  default-extensions:
+      LambdaCase
+      MultiWayIf
+      RecordWildCards
+      OverloadedRecordDot
+      OverloadedStrings
+      GADTs
+      GHC2021
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      ansi-terminal
+    , attoparsec
+    , base >=4.7 && <5
+    , containers
+    , directory
+    , mtl
+    , optparse-applicative
+    , parser-combinators
+    , text
+    , time
+    , vector
+  default-language: Haskell2010
+
+executable advent-of-code-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_advent_of_code
+  autogen-modules:
+      Paths_advent_of_code
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      advent-of-code
+    , ansi-terminal
+    , attoparsec
+    , base >=4.7 && <5
+    , containers
+    , directory
+    , mtl
+    , optparse-applicative
+    , parser-combinators
+    , text
+    , time
+    , vector
+  default-language: Haskell2010
+
+test-suite advent-of-code-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_advent_of_code
+  autogen-modules:
+      Paths_advent_of_code
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N4 -with-rtsopts=-qa -with-rtsopts=-C0 -funfolding-use-threshold=16 -fexcess-precision -optc-O3 -optc-ffast-math -O2
+  build-depends:
+      advent-of-code
+    , ansi-terminal
+    , attoparsec
+    , base >=4.7 && <5
+    , containers
+    , directory
+    , hspec >=2.7
+    , mtl
+    , optparse-applicative
+    , parser-combinators
+    , process
+    , regex-compat
+    , regex-tdfa
+    , text
+    , time
+    , vector
+  default-language: Haskell2010

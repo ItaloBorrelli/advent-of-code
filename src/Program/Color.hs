@@ -1,6 +1,6 @@
-module Program.Color where
+module Program.Color (withColor) where
 
-import System.Console.ANSI
+import           System.Console.ANSI
 
 withColor :: Color -> IO a -> IO a
 withColor col action = do

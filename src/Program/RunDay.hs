@@ -1,18 +1,17 @@
-{-# LANGUAGE TypeApplications #-}
-
 module Program.RunDay (runDay, Day, Verbosity (Quiet, Timings, Verbose)) where
 
-import Control.Exception (SomeException, catch)
-import Control.Monad.Except
-import Data.Attoparsec.Text
-import Data.Functor
-import Data.Text (pack)
-import Data.Time (diffUTCTime, getCurrentTime)
-import Program.Color
-import System.Console.ANSI
-import System.Directory (doesFileExist)
-import Text.Printf
-
+import           Control.Exception      (SomeException, catch)
+import           Control.Monad          (when)
+import           Control.Monad.Except   (MonadError (throwError), runExceptT)
+import           Control.Monad.IO.Class (liftIO)
+import           Data.Attoparsec.Text   (Parser, parseOnly)
+import           Data.Functor           (($>))
+import           Data.Text              (pack)
+import           Data.Time              (diffUTCTime, getCurrentTime)
+import           Program.Color          (withColor)
+import           System.Console.ANSI    (Color (Blue, Red))
+import           System.Directory       (doesFileExist)
+import           Text.Printf            (printf)
 data Verbosity = Quiet | Timings | Verbose deriving (Eq, Show, Ord)
 
 type Day = Verbosity -> String -> IO (Maybe Double, Maybe Double)
@@ -52,7 +51,7 @@ runDay inputParser partA partB verbosity inputFile = do
       time2 <- getCurrentTime
 
       let timeA = realToFrac $ diffUTCTime time2 time1
-      when (verbosity >= Timings && successA) $ putStrLn $ printf "(%.2f)" timeA
+      when (verbosity >= Timings && successA) $ putStrLn $ printf "(%.2fs)" timeA
 
       withColor Blue $ putStrLn "Part B:"
       successB <- catch (print (partB i) $> True) $

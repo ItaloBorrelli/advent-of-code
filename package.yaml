@@ -1,13 +1,14 @@
-name:                aoc-template
-version:             2023.0
-github:              "samcoy3/advent-of-code-template"
-license:             BSD3
-author:              "Sam Coy"
-maintainer:          "samcoy3@gmail.com"
-copyright:           "2023 Sam Coy"
+name:                advent-of-code
+version:             0.1.0.0
+github:              "ItaloBorrelli/advent-of-code"
+license:             BSD-3-Clause
+author:              "Italo Borrelli"
+maintainer:          "iborrelli@protonmail.com"
+copyright:           "2024 Italo Borrelli"
 
 extra-source-files:
 - README.md
+- CHANGELOG.md
 
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
@@ -16,7 +17,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         A template for Advent of Code projects in Haskell
+description:         Please see the README on GitHub at <https://github.com/ItaloBorrelli/advent-of-code#readme>
 
 dependencies:
 - base >= 4.7 && < 5
@@ -31,6 +32,17 @@ dependencies:
 - mtl
 - vector
 
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
 library:
   source-dirs: src
   default-extensions:
@@ -43,9 +55,20 @@ library:
     - GHC2021
 
 executables:
-  aoc-template-exe:
+  advent-of-code-exe:
     main:                Main.hs
     source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - advent-of-code
+
+tests:
+  advent-of-code-test:
+    main:                Spec.hs
+    source-dirs:         test
     ghc-options:
     - -threaded
     - -rtsopts
@@ -57,13 +80,9 @@ executables:
     - -optc-O3
     - -optc-ffast-math
     - -O2
-    default-extensions:
-    - LambdaCase
-    - MultiWayIf
-    - RecordWildCards
-    - OverloadedRecordDot
-    - OverloadedStrings
-    - GADTs
-    - GHC2021
     dependencies:
-    - aoc-template
+    - advent-of-code
+    - process
+    - hspec >= 2.7
+    - regex-tdfa
+    - regex-compat
