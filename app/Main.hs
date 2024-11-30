@@ -88,12 +88,15 @@ days =
       -- Insert new days here
     ]
 
+formatDay :: Int -> String
+formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)
+
 performDay :: Options -> IO ()
 performDay (Options d v) = case d of
   AllDays -> do
     results <-
       let eachDay day (dayFunc, inputFile) = do
-            withColor Magenta $ putStrLn $ printf "\n***Day %02d***" day
+            withColor Magenta $ putStrLn $ formatDay day
             dayFunc v inputFile
        in sequence $ mapWithKey eachDay days
 
@@ -102,7 +105,7 @@ performDay (Options d v) = case d of
     Nothing -> putStrLn "Invalid day provided."
     Just (dayFunc, inputFile) -> do
       let i' = fromMaybe inputFile input
-      withColor Magenta $ putStrLn $ printf "\n***Day %02d***" day
+      withColor Magenta $ putStrLn $ formatDay day
       _ <- dayFunc v i'
       withColor Magenta $ putStrLn "************"
 
