@@ -4,4 +4,5 @@
         "editor.defaultFormatter": "vigoo.stylish-haskell"
     },
     "haskell.manageHLS": "GHCup",
+    "haskell.formattingProvider": "stylish-haskell",
 }

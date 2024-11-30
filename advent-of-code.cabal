@@ -9,7 +9,7 @@ version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/ItaloBorrelli/advent-of-code#readme>
 homepage:       https://github.com/ItaloBorrelli/advent-of-code#readme
 bug-reports:    https://github.com/ItaloBorrelli/advent-of-code/issues
-author:         Italo Borrelli
+author:         ItaloBorrelli
 maintainer:     iborrelli@protonmail.com
 copyright:      2024 Italo Borrelli
 license:        BSD-3-Clause
@@ -104,7 +104,6 @@ test-suite advent-of-code-test
     , parser-combinators
     , process
     , regex-compat
-    , regex-tdfa
     , text
     , time
     , vector

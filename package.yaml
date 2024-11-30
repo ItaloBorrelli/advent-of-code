@@ -2,7 +2,7 @@ name:                advent-of-code
 version:             0.1.0.0
 github:              "ItaloBorrelli/advent-of-code"
 license:             BSD-3-Clause
-author:              "Italo Borrelli"
+author:              "ItaloBorrelli"
 maintainer:          "iborrelli@protonmail.com"
 copyright:           "2024 Italo Borrelli"
 
@@ -84,5 +84,4 @@ tests:
     - advent-of-code
     - process
     - hspec >= 2.7
-    - regex-tdfa
     - regex-compat
