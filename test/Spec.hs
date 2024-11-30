@@ -52,3 +52,4 @@ main :: IO ()
 main = hspec $ do
   describe "AoC" $ do
     -- Add new tests here
+    it "testname" $ do putStrLn "No tests"
