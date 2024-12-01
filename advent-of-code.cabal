@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       AOC.Y2022.Day01
+      AOC.Y2022.Day02
       Program.Color
       Program.RunDay
       Util.Util
