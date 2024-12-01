@@ -73,28 +73,21 @@ instance Ord Int' where
 -- Go forward through list and find the minimum element
 -- Then go back through the list and replace all instances of the minimum element with Infinity
 -- Returns the list with the minimum element replaced with Infinity and the positions of the minimum elements
-findAndReplaceMins :: [(Int', Int')] -> Int -> (Int', Int') -> (Int', [(Int', Int')], ([Int'], [Int']), (Int', Int'))
-findAndReplaceMins [] _ m = (Inf, [], ([Inf], [Inf]), m)
-findAndReplaceMins ((x1, x2):xs) i (m1, m2) =
-    let (min_dist, xs', (xpositions, ypositions), (m1', m2')) = findAndReplaceMins xs (i + 1) (min m1 x1, min m2 x2)
-    in
-        let ((x1', xpositions'), (x2', ypositions')) =
-                (if x1 == m1' then (Inf, Finite i:xpositions) else (x1, xpositions)
-                ,if x2 == m2' then (Inf, Finite i:ypositions) else (x2, ypositions)
-                )
-        in (min min_dist $ abs (head xpositions' - head ypositions'), (x1', x2'):xs', (xpositions', ypositions'), (m1', m2'))
+findAndReplaceMins :: [(Int', Int')] -> (Int', Int') -> ([(Int', Int')], (Int', Int'))
+findAndReplaceMins [] m = ([], m)
+findAndReplaceMins ((x1, x2):xs) (m1, m2) =
+    let (xs', (m1', m2')) = findAndReplaceMins xs (min m1 x1, min m2 x2)
+    in ((if x1 == m1' then Inf else x1, if x2 == m2' then Inf else x2):xs', (m1', m2'))
 
 ------------ PART A ------------
 partA :: Input -> OutputA
 partA = go 0
     where
         go dist_sums xs =
-            let (min_dist, xs', _, (m1, m2)) = findAndReplaceMins xs 1 (Inf, Inf)
+            let (xs', (m1, m2)) = findAndReplaceMins xs (Inf, Inf)
             in if m1 == Inf || m2 == Inf
-                --  then dist_sums
-                --  else trace (show (min_dist, xs', (m1, m2))) go (min_dist + dist_sums) xs'
                  then dist_sums
-                 else trace (show min_dist) go (min_dist+dist_sums) xs'
+                 else trace (show (m1, m2)) go (abs(m1 - m2) + dist_sums) xs'
 
 ------------ PART B ------------
 partB :: Input -> OutputB
