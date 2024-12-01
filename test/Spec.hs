@@ -42,7 +42,8 @@ runDay (year, day) = do
     then do
       putStrLn $ "Test for " ++ year ++ day ++ " reported \"Parser not yet implemented!\"."
     else do
-      let (actualPartA, actualPartB) = parseOutput (stripAnsiString output)
+      putStrLn output
+      let (actualPartA, actualPartB) = parseOutput cleanOutput
 
       -- Compare results
       actualPartA `shouldBe` head expectedAnswers
@@ -52,3 +53,4 @@ main :: IO ()
 main = hspec $ do
   describe "AoC" $ do
     -- Add new tests here
+    it "202201" $ do runDay ("2022", "01")
