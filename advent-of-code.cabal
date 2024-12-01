@@ -27,6 +27,7 @@ library
   exposed-modules:
       AOC.Y2022.Day01
       AOC.Y2022.Day02
+      AOC.Y2024.Day01
       Program.Color
       Program.RunDay
       Util.Util
