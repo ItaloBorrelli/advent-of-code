@@ -4,13 +4,15 @@ import           Control.Exception      (SomeException, catch)
 import           Control.Monad          (when)
 import           Control.Monad.Except   (MonadError (throwError), runExceptT)
 import           Control.Monad.IO.Class (liftIO)
-import           Data.Attoparsec.Text   (Parser, parseOnly)
 import           Data.Functor           (($>))
 import           Data.Text              (pack)
+import           Data.Text.IO           (readFile)
 import           Data.Time              (diffUTCTime, getCurrentTime)
 import           Program.Color          (withColor)
 import           System.Console.ANSI    (Color (Blue, Red))
 import           System.Directory       (doesFileExist)
+import           Text.Parsec            (Parsec, parse)
+import           Text.Parsec.Text       (Parser)
 import           Text.Printf            (printf)
 data Verbosity = Quiet | Timings | Verbose deriving (Eq, Show, Ord)
 
@@ -22,7 +24,7 @@ runDay inputParser partA partB verbosity inputFile = do
     inputFileExists <- liftIO $ doesFileExist inputFile
     fileContents <-
       if inputFileExists
-        then liftIO $ readFile inputFile
+        then liftIO $ Data.Text.IO.readFile inputFile
         else
           throwError $
             unwords
@@ -30,8 +32,8 @@ runDay inputParser partA partB verbosity inputFile = do
                 "I was expecting it to be at",
                 inputFile
               ]
-    case parseOnly inputParser . pack $ fileContents of
-      Left e -> throwError $ "Parser failed to read input. Error:\n" ++ e
+    case parse inputParser inputFile fileContents of
+      Left e -> throwError $ "Parser failed to read input. Error:\n" ++ show e
       Right i -> do
         when (verbosity == Verbose) $ do
           liftIO $ putStrLn "Parser output:"

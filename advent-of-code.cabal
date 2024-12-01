@@ -45,12 +45,12 @@ library
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       ansi-terminal
-    , attoparsec
     , base >=4.7 && <5
     , containers
     , directory
     , mtl
     , optparse-applicative
+    , parsec
     , parser-combinators
     , text
     , time
@@ -69,12 +69,12 @@ executable advent-of-code-exe
   build-depends:
       advent-of-code
     , ansi-terminal
-    , attoparsec
     , base >=4.7 && <5
     , containers
     , directory
     , mtl
     , optparse-applicative
+    , parsec
     , parser-combinators
     , text
     , time
@@ -94,13 +94,13 @@ test-suite advent-of-code-test
   build-depends:
       advent-of-code
     , ansi-terminal
-    , attoparsec
     , base >=4.7 && <5
     , containers
     , directory
     , hspec >=2.7
     , mtl
     , optparse-applicative
+    , parsec
     , parser-combinators
     , process
     , regex-compat

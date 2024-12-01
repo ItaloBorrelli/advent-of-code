@@ -1,8 +1,9 @@
 module AOC.Y2022.DayXX (runDay) where
 
-import           Data.Attoparsec.Text
 import           Data.Void
-import qualified Program.RunDay       as R (Day, runDay)
+import qualified Program.RunDay   as R (Day, runDay)
+import           Text.Parsec
+import           Text.Parsec.Text
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -18,7 +19,7 @@ type OutputA = Void
 
 type OutputB = Void
 
------------- CODE --------------
+------------ UTIL --------------
 
 ------------ PART A ------------
 partA :: Input -> OutputA
