@@ -8,3 +8,6 @@ cradle:
 
     - path: "./test"
       component: "advent-of-code:test:advent-of-code-test"
+
+    - path: "data-aviary-0.4.0/src"
+      component: "data-aviary:lib"
