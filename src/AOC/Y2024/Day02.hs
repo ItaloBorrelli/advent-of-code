@@ -27,10 +27,11 @@ monotonic = (==) `on` (>0)
 withinLimits :: Int -> Bool
 withinLimits = uncurry (&&) . ((>=1) &&& (<=3)) . abs
 
-isSafe :: Maybe Int -> [Int] -> Bool
-isSafe firstInc (x1:x2:xs) =
-    (\d -> withinLimits d && monotonic d (fromMaybe d firstInc) && isSafe (Just d) (x2:xs)) (x2 - x1)
-isSafe _ _ = True
+isSafe :: Maybe Int -> Maybe Int -> [Int] -> Bool
+isSafe Nothing Nothing (x:xs) = isSafe Nothing (Just x) xs
+isSafe firstInc (Just prev) (x:xs) =
+    (\d -> withinLimits d && monotonic d (fromMaybe d firstInc) && isSafe (Just d) (Just x) xs) (x - prev)
+isSafe _ _ _ = True
 
 isSafeAfterRemoval :: Maybe Int -> Bool -> [Int] -> Bool
 isSafeAfterRemoval firstInc hasError (x1:x2:xs) =
@@ -41,7 +42,7 @@ isSafeAfterRemoval _ _ _ = True
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = length . filter id . map (isSafe Nothing)
+partA = length . filter id . map (isSafe Nothing Nothing)
 
 ------------ PART B ------------
 partB :: Input -> OutputB
