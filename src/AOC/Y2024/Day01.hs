@@ -10,15 +10,8 @@ runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
-splitLine :: Parser (Int, Int)
-splitLine = do
-  num1 <- many1 digit
-  _ <- many1 space
-  num2 <- many1 digit
-  return (read num1, read num2)
-
 inputParser :: Parser Input
-inputParser = splitLine `sepEndBy` newline
+inputParser = (((,) . read <$> many1 digit) <* many1 space <*> (read <$> many1 digit)) `sepEndBy` newline
 
 ------------ TYPES -------------
 type Input = [(Int, Int)]
@@ -43,7 +36,6 @@ countAndRemoveValue (x:xs) v =
 
 countAndRemoveLeft :: [Int] -> [Int] -> Int
 countAndRemoveLeft [] _ = 0
-countAndRemoveLeft _ [] = 0
 countAndRemoveLeft (x:xs) ys =
     let (xs', countInLeft) = countAndRemoveValue xs x
         (ys', countInRight) = countAndRemoveValue ys x
