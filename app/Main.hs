@@ -10,6 +10,7 @@ module Main (main) where
 import qualified AOC.Y2022.Day01 as Y2022Day01
 import qualified AOC.Y2022.Day02 as Y2022Day02
 import qualified AOC.Y2024.Day01 as Y2024Day01
+import qualified AOC.Y2024.Day02 as Y2024Day02
 
 -- Other imports
 import qualified Control.Applicative.Combinators as C (option)
@@ -127,7 +128,8 @@ days =
       -- Insert new days here
       (202201, (Y2022Day01.runDay, "inputs/2022/01/input.txt")),
       (202202, (Y2022Day02.runDay, "inputs/2022/02/input.txt")),
-      (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt"))
+      (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")),
+      (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt"))
     ]
 
 formatDay :: Int -> String
