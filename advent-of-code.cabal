@@ -51,6 +51,7 @@ library
       ansi-terminal
     , base >=4.7 && <5
     , containers
+    , data-aviary
     , directory
     , mtl
     , optparse-applicative
@@ -75,6 +76,7 @@ executable advent-of-code-exe
     , ansi-terminal
     , base >=4.7 && <5
     , containers
+    , data-aviary
     , directory
     , mtl
     , optparse-applicative
@@ -100,6 +102,7 @@ test-suite advent-of-code-test
     , ansi-terminal
     , base >=4.7 && <5
     , containers
+    , data-aviary
     , directory
     , hspec >=2.7
     , mtl
