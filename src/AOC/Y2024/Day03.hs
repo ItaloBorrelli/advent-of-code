@@ -1,12 +1,12 @@
 module AOC.Y2024.Day03 (runDay) where
 
-import           Data.Either      (rights)
 import           Data.Functor     (($>))
 import           Data.Maybe       (catMaybes)
-import           Data.Void
+import           Data.Void        (Void)
 import qualified Program.RunDay   as R (Day, runDay)
-import           Text.Parsec
-import           Text.Parsec.Text
+import           Text.Parsec      (anyChar, char, digit, eof, many, many1,
+                                   string, try, (<|>))
+import           Text.Parsec.Text (Parser)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
