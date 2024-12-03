@@ -7,29 +7,49 @@ module Main (main) where
 
 --- Other imports
 import qualified Control.Applicative.Combinators as C (option)
-import           Control.Monad                   (forM_, unless)
-import           Data.List                       (intercalate)
-import           Data.Map                        (Map, fromList, mapKeys,
-                                                  mapWithKey, toList, (!?))
-import           Data.Maybe                      (fromMaybe)
-import           Options.Applicative             (Alternative ((<|>)), Parser,
-                                                  auto, execParser, flag',
-                                                  fullDesc, help, helper, info,
-                                                  long, metavar, option,
-                                                  optional, progDesc, short,
-                                                  strOption, (<**>))
-import           Program.RunDay                  (Day,
-                                                  Verbosity (Quiet, Timings, Verbose))
-
+import Control.Monad (forM_, unless)
+import Data.List (intercalate)
+import Data.Map
+  ( Map,
+    fromList,
+    mapKeys,
+    mapWithKey,
+    toList,
+    (!?),
+  )
+import Data.Maybe (fromMaybe)
+import Options.Applicative
+  ( Alternative ((<|>)),
+    Parser,
+    auto,
+    execParser,
+    flag',
+    fullDesc,
+    help,
+    helper,
+    info,
+    long,
+    metavar,
+    option,
+    optional,
+    progDesc,
+    short,
+    strOption,
+    (<**>),
+  )
 -- Data Output
-import           Program.Color                   (withColor)
-import           System.Console.ANSI             (Color (..))
-import           Text.Printf                     (printf)
+import Program.Color (withColor)
+import Program.RunDay
+  ( Day,
+    Verbosity (Quiet, Timings, Verbose),
+  )
+import System.Console.ANSI (Color (..))
+import Text.Printf (printf)
 
 data Days
   = AllDays
   | OneDay
-      { day   :: Int,
+      { day :: Int,
         input :: Maybe String
       }
   deriving (Show)
@@ -41,13 +61,17 @@ dayParser = (OneDay <$> day <*> input) <|> allDays
   where
     day =
       option auto $
-        long "day" <> short 'd' <> metavar "DAY"
+        long "day"
+          <> short 'd'
+          <> metavar "DAY"
           <> help "Present the solutions for one day."
 
     input =
       optional $
         strOption $
-          long "input" <> short 'i' <> metavar "FILE"
+          long "input"
+            <> short 'i'
+            <> metavar "FILE"
             <> help "The file to read the selected day's input from."
 
     allDays =
@@ -66,7 +90,10 @@ optionsParser = Options <$> dayParser <*> verbosityParser
     verbosityParser :: Parser Verbosity
     verbosityParser =
       C.option Quiet $
-        flag' Verbose (long "verbose" <> short 'v'
+        flag'
+          Verbose
+          ( long "verbose"
+              <> short 'v'
               <> help
                 ( unwords
                     [ "Whether to print out extra info, such as the",
@@ -74,19 +101,24 @@ optionsParser = Options <$> dayParser <*> verbosityParser
                       "error messages.",
                       "Also enables timing of solutions."
                     ]
-                ))
-          <|> flag' Timings (long "timings" <> short 't'
-                    <> help
-                      ( unwords
-                          ["Whether to enable timing of the solutions."]
-                      ))
+                )
+          )
+          <|> flag'
+            Timings
+            ( long "timings"
+                <> short 't'
+                <> help
+                  ( unwords
+                      ["Whether to enable timing of the solutions."]
+                  )
+            )
 
 days :: Map Int (Day, String)
 days =
   fromList
-    [
-      -- Insert new days here
-    ]
+    []
+
+-- Insert new days here
 
 formatDay :: Int -> String
 formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)

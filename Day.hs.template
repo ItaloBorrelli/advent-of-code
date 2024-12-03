@@ -1,4 +1,4 @@
-module AOC.Y2022.DayXX (runDay) where
+module AOC.YYYYY.DayXX (runDay) where
 
 import           Data.Void
 import qualified Program.RunDay   as R (Day, runDay)

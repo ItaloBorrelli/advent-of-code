@@ -1,8 +1,8 @@
 {
     "[haskell]": {
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "vigoo.stylish-haskell"
+        "editor.defaultFormatter": "haskell.haskell"
     },
     "haskell.manageHLS": "GHCup",
-    "haskell.formattingProvider": "stylish-haskell",
+    "haskell.formattingProvider": "ormolu",
 }

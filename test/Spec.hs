@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-import           Data.List      (isInfixOf)
-import           System.Process (readProcess)
-import           Test.Hspec     (describe, hspec, it, shouldBe)
-import           Text.Regex     (mkRegex, subRegex)
+import Data.List (isInfixOf)
+import System.Process (readProcess)
+import Test.Hspec (describe, hspec, it, shouldBe)
+import Text.Regex (mkRegex, subRegex)
 
 -- Path utilities for test inputs and answers
 testInputPath :: String -> String -> FilePath
@@ -26,7 +26,7 @@ parseOutput output =
   let linesOfOutput = lines output
       partAOutput = extractOutput "Part A:" linesOfOutput
       partBOutput = extractOutput "Part B:" linesOfOutput
-  in (partAOutput, partBOutput)
+   in (partAOutput, partBOutput)
 
 -- Extract output after a specific section label
 extractOutput :: String -> [String] -> String

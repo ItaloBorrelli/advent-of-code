@@ -49,7 +49,7 @@ SOLUTION_FILE="$SOLVE_DIR/$SOLVE_FILE_NAME"
 if [ ! -f $SOLUTION_FILE ]; then
     mkdir -p $SOLVE_DIR
     cp ./Day.hs.template $SOLUTION_FILE
-    sed -i "s/DayXX/Day$DAY/g" $SOLUTION_FILE
+    sed -i "s/YYYYY\.DayXX/Y$YEAR.Day$DAY/g" $SOLUTION_FILE
     echo "Created $SOLUTION_FILE"
 else
     echo "Solution file already exists."

@@ -14,10 +14,10 @@ Then run `stack build`.
 
 ### VS Code
 
-Install the following if you will be using the `haskell-linter` (`hoovercj.haskell-linter`) and `stylish-haskell` (`vigoo.stylish-haskell`):
+Install the following if you will be using the `haskell-linter` (`hoovercj.haskell-linter`) and `ormolu` (configured for VS Code to be used through the `haskell.haskell` extension):
 
 ```bash
-stack install hlint stylish-haskell
+stack install hlint ormolu
 ```
 
 Then open VS Code and install recommended or desired extensions.
