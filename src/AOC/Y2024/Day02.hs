@@ -1,6 +1,5 @@
 module AOC.Y2024.Day02 (runDay) where
 
-import Control.Applicative ((<|>))
 import Control.Arrow ((&&&))
 import Data.Function (on)
 import Data.Maybe (fromMaybe)
