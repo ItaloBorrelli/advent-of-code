@@ -12,8 +12,7 @@ import qualified AOC.Y2022.Day02 as Y2022Day02
 import qualified AOC.Y2024.Day01 as Y2024Day01
 import qualified AOC.Y2024.Day02 as Y2024Day02
 import qualified AOC.Y2024.Day03 as Y2024Day03
-
--- Other imports
+--- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
 import Data.List (intercalate)
@@ -125,8 +124,7 @@ optionsParser = Options <$> dayParser <*> verbosityParser
 days :: Map Int (Day, String)
 days =
   fromList
-    [
-      -- Insert new days here
+    [ -- Insert new days here
       (202201, (Y2022Day01.runDay, "inputs/2022/01/input.txt")),
       (202202, (Y2022Day02.runDay, "inputs/2022/02/input.txt")),
       (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")),
