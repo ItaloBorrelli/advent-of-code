@@ -33,12 +33,11 @@ isSafe firstInc (Just prev) (x:xs) =
     (\d -> withinLimits d && monotonic d (fromMaybe d firstInc) && isSafe (Just d) (Just x) xs) (x - prev)
 isSafe _ _ _ = True
 
-isSafeAfterRemoval :: Maybe Int -> Bool -> [Int] -> Bool
-isSafeAfterRemoval firstInc hasError (x1:x2:xs) =
-    (\d -> (withinLimits d && monotonic d (fromMaybe d firstInc) && isSafeAfterRemoval (Just d) False (x2:xs))
-    ||
-    (not hasError && isSafeAfterRemoval firstInc True (x1:xs))) (x2 - x1)
-isSafeAfterRemoval _ _ _ = True
+isSafeAfterRemoval :: Maybe Int -> Maybe Int -> [Int] -> Bool -> Bool
+isSafeAfterRemoval Nothing Nothing (x:xs) hasFailure = isSafeAfterRemoval Nothing (Just x) xs hasFailure || isSafeAfterRemoval Nothing (Just x) xs True
+isSafeAfterRemoval firstInc (Just prev) (x:xs) hasFailure =
+    (\d -> withinLimits d && monotonic d (fromMaybe d firstInc) && isSafeAfterRemoval (Just d) (Just x) xs hasFailure) (x - prev) || (not hasFailure && isSafeAfterRemoval Nothing (Just prev) xs True)
+isSafeAfterRemoval _ _ _ _ = True
 
 ------------ PART A ------------
 partA :: Input -> OutputA
@@ -46,4 +45,4 @@ partA = length . filter id . map (isSafe Nothing Nothing)
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = length . filter id . map (isSafeAfterRemoval Nothing False)
+partB = length . filter id . map (flip (isSafeAfterRemoval Nothing Nothing) False)
