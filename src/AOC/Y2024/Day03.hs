@@ -1,11 +1,11 @@
 module AOC.Y2024.Day03 (runDay) where
 
 import           Data.Either      (rights)
+import           Data.Functor     (($>))
+import           Data.Maybe       (catMaybes)
 import           Data.Void
-import           Debug.Trace      (trace)
 import qualified Program.RunDay   as R (Day, runDay)
 import           Text.Parsec
-import           Text.Parsec      (many1, string)
 import           Text.Parsec.Text
 
 runDay :: R.Day
@@ -13,21 +13,19 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 parseAnyMul :: Parser (Int, Int)
-parseAnyMul = do
-    _ <- string "mul("
-    digits1 <- many1 digit
-    _ <- char ','
-    digits2 <- many1 digit
-    _ <- char ')'
-    return (read digits1, read digits2)
+parseAnyMul =
+    string "mul(" *>
+    (((,) . read <$> many1 digit)
+         <*> (char ',' *> (read <$> many1 digit)))
+    <* char ')'
 
-parseAnyOrSkip :: Parser (Either Char (Int, Int))
+parseAnyOrSkip :: Parser (Maybe (Int, Int))
 parseAnyOrSkip =
-    (Right <$> try parseAnyMul)
-    <|> (Left <$> anyChar)
+    (Just <$> try parseAnyMul)
+    <|> (anyChar $> Nothing)
 
 inputParser :: Parser Input
-inputParser = rights <$> (many parseAnyOrSkip <* eof)
+inputParser = catMaybes <$> (many parseAnyOrSkip <* eof)
 
 ------------ TYPES -------------
 type Input = [(Int, Int)]
