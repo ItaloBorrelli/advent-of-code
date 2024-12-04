@@ -1,12 +1,13 @@
 module Util.Util
-    ( freq
-    , mapFromNestedLists
-    , chunksOf
-    , chunksByPredicate
-    , traceShowIdWithContext
-    , (!!?)
-    , mapBoundingBox
-    )
+  ( freq,
+    mapFromNestedLists,
+    chunksOf,
+    chunksByPredicate,
+    traceShowIdWithContext,
+    (!!?),
+    mapBoundingBox,
+    both
+  )
 where
 
 import Data.Map.Strict (Map)
@@ -82,3 +83,6 @@ mapBoundingBox m =
         (maximum . fmap fst . Map.keys $ m)
         (minimum . fmap snd . Map.keys $ m)
         (maximum . fmap snd . Map.keys $ m)
+
+both :: (a -> b) -> (a, a) -> (b, b)
+both f (x, y) = (f x, f y)
