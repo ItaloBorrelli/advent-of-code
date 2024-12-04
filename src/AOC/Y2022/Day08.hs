@@ -2,7 +2,6 @@ module AOC.Y2022.Day08 (runDay) where
 
 import Data.Void
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec
 import Text.Parsec.Text
 
 runDay :: R.Day
