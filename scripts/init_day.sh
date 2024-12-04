@@ -61,7 +61,7 @@ MAIN_FILE="app/Main.hs"
 IMPORT_STATEMENT="import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
 IMPORT_PREFIX=${IMPORT_STATEMENT:0:32}
 if ! grep -q "$IMPORT_PREFIX" "$MAIN_FILE"; then
-    sed -i "/-- Day imports/ { :a; n; /^import /! { s/.*/&$IMPORT_STATEMENT\n/; b }; ba }" "$MAIN_FILE"
+    sed -i "/-- Day imports/ { :a; n; /^import /! { s/.*/$IMPORT_STATEMENT\n&/; b }; ba }" "$MAIN_FILE"
     echo "Added import statement to $MAIN_FILE"
 else
     echo "Matching import statement already exists in $MAIN_FILE"

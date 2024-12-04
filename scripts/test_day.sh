@@ -14,7 +14,7 @@ for arg in "$@"; do
 done
 
 if [[ "$all_days_flag" == true ]]; then
-    stack run -- --all-days $additional_flags
+    stack run -- --all-days
     exit 0
 fi
 
@@ -25,4 +25,4 @@ echo "Day: $DAY"
 
 
 
-stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/ $additional_flags" --progress-bar=none 
+stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/" --progress-bar=none 
