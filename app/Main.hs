@@ -1,15 +1,18 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-partial-fields #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use empty" #-}
 
 module Main (main) where
 
---- Day imports
+-- Day imports
 import qualified AOC.Y2022.Day01 as Y2022Day01
 import qualified AOC.Y2022.Day02 as Y2022Day02
 import qualified AOC.Y2024.Day01 as Y2024Day01
 import qualified AOC.Y2024.Day02 as Y2024Day02
 import qualified AOC.Y2024.Day03 as Y2024Day03
---- Other imports
+-- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
 import Data.List (intercalate)
@@ -117,6 +120,7 @@ optionsParser = Options <$> dayParser <*> verbosityParser
                   )
             )
 
+{- ORMOLU_DISABLE -}
 days :: Map Int (Day, String)
 days =
   fromList
@@ -127,6 +131,7 @@ days =
       (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt")),
       (202403, (Y2024Day03.runDay, "inputs/2024/03/input.txt"))
     ]
+{- ORMOLU_ENABLE -}
 
 formatDay :: Int -> String
 formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)

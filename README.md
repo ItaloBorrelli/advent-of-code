@@ -14,10 +14,10 @@ Then run `stack build`.
 
 ### VS Code
 
-Install the following if you will be using the `haskell-linter` (`hoovercj.haskell-linter`) and `ormolu` (configured for VS Code to be used through the `haskell.haskell` extension):
+Install the following if you will be using the `haskell-linter` (`hoovercj.haskell-linter`) and `ormolu` (configured for VS Code to be used through the `haskell.haskell` extension). `apply-refact` can be used so  :
 
 ```bash
-stack install hlint ormolu
+stack install hlint ormolu apply-refact
 ```
 
 Then open VS Code and install recommended or desired extensions.
