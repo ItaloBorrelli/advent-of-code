@@ -1,5 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-partial-fields #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
+{-# HLINT ignore "Use empty" #-}
 
 module Main (main) where
 
@@ -113,12 +116,14 @@ optionsParser = Options <$> dayParser <*> verbosityParser
                   )
             )
 
+{- ORMOLU_DISABLE -}
 days :: Map Int (Day, String)
 days =
   fromList
-    []
-
--- Insert new days here
+    [
+      -- Insert new days here
+    ]
+{- ORMOLU_ENABLE -}
 
 formatDay :: Int -> String
 formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)
