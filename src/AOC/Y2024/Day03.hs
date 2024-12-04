@@ -20,19 +20,18 @@ runDay = R.runDay inputParser partA partB
 parseMul :: Parser (Int, Int)
 parseMul =
   string "mul("
-    *> ( ((,) . read <$> many1 digit)
-           <*> (char ',' *> (read <$> many1 digit))
+    *> ( ((,) . read <$> many1 digit) <*> (char ',' *> (read <$> many1 digit))
        )
     <* char ')'
 
 inputParser :: Parser Input
 inputParser =
-  many $
-    do
-      Mul <$> try parseMul
-      <|> (Enable <$ try (string "do()"))
-      <|> (Disable <$ try (string "don't()"))
-      <|> (Junk <$> anyChar)
+  many
+    ( Mul <$> try parseMul
+        <|> (Enable <$ try (string "do()"))
+        <|> (Disable <$ try (string "don't()"))
+        <|> (Junk <$> anyChar)
+    )
 
 ------------ TYPES -------------
 type Input = [Commands]
