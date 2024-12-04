@@ -6,9 +6,9 @@
 
 module Main (main) where
 
---- Day imports
+-- Day imports
 
---- Other imports
+-- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
 import Data.List (intercalate)
