@@ -12,7 +12,10 @@ import qualified AOC.Y2022.Day02 as Y2022Day02
 import qualified AOC.Y2024.Day01 as Y2024Day01
 import qualified AOC.Y2024.Day02 as Y2024Day02
 import qualified AOC.Y2024.Day03 as Y2024Day03
--- Other importsimport qualified AOC.Y2022.Day03 as Y2022Day03import qualified AOC.Y2022.Day04 as Y2022Day04import qualified AOC.Y2022.Day05 as Y2022Day05import qualified AOC.Y2022.Day06 as Y2022Day06import qualified AOC.Y2022.Day07 as Y2022Day07import qualified AOC.Y2022.Day08 as Y2022Day08import qualified AOC.Y2022.Day09 as Y2022Day09import qualified AOC.Y2022.Day10 as Y2022Day10import qualified AOC.Y2022.Day11 as Y2022Day11import qualified AOC.Y2022.Day12 as Y2022Day12import qualified AOC.Y2022.Day13 as Y2022Day13
+-- Other importsimport qualified AOC.Y2022.Day03 as Y2022Day03import qualified AOC.Y2022.Day04 as Y2022Day04import qualified AOC.Y2022.Day05 as Y2022Day05import qualified AOC.Y2022.Day06 as Y2022Day06import qualified AOC.Y2022.Day07 as Y2022Day07import qualified AOC.Y2022.Day08 as Y2022Day08import qualified AOC.Y2022.Day09 as Y2022Day09import qualified AOC.Y2022.Day10 as Y2022Day10import qualified AOC.Y2022.Day11 as Y2022Day11import qualified AOC.Y2022.Day12 as Y2022Day12import qualified AOC.Y2022.Day13 as Y2022Day13import qualified AOC.Y2022.Day14 as Y2022Day14import qualified AOC.Y2022.Day15 as Y2022Day15import qualified AOC.Y2022.Day16 as Y2022Day16
+
+
+
 
 
 
@@ -151,7 +154,10 @@ days =
       (202210, (Y2022Day10.runDay, "inputs/2022/10/input.txt")),
       (202211, (Y2022Day11.runDay, "inputs/2022/11/input.txt")),
       (202212, (Y2022Day12.runDay, "inputs/2022/12/input.txt")),
-      (202213, (Y2022Day13.runDay, "inputs/2022/13/input.txt"))
+      (202213, (Y2022Day13.runDay, "inputs/2022/13/input.txt")),
+      (202214, (Y2022Day14.runDay, "inputs/2022/14/input.txt")),
+      (202215, (Y2022Day15.runDay, "inputs/2022/15/input.txt")),
+      (202216, (Y2022Day16.runDay, "inputs/2022/16/input.txt"))
     ]
 {- ORMOLU_ENABLE -}
 
