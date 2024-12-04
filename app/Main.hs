@@ -140,10 +140,6 @@ days =
     [ -- Insert new days here
       (202201, (Y2022Day01.runDay, "inputs/2022/01/input.txt")),
       (202202, (Y2022Day02.runDay, "inputs/2022/02/input.txt")),
-      (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")),
-      (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt")),
-      (202403, (Y2024Day03.runDay, "inputs/2024/03/input.txt")),
-      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt")),
       (202203, (Y2022Day03.runDay, "inputs/2022/03/input.txt")),
       (202204, (Y2022Day04.runDay, "inputs/2022/04/input.txt")),
       (202205, (Y2022Day05.runDay, "inputs/2022/05/input.txt")),
@@ -154,7 +150,14 @@ days =
       (202210, (Y2022Day10.runDay, "inputs/2022/10/input.txt")),
       (202211, (Y2022Day11.runDay, "inputs/2022/11/input.txt")),
       (202212, (Y2022Day12.runDay, "inputs/2022/12/input.txt")),
-      (202213, (Y2022Day13.runDay, "inputs/2022/13/input.txt"))
+      (202213, (Y2022Day13.runDay, "inputs/2022/13/input.txt")),
+      (202214, (Y2022Day14.runDay, "inputs/2022/14/input.txt")),
+      (202215, (Y2022Day15.runDay, "inputs/2022/15/input.txt")),
+      (202216, (Y2022Day16.runDay, "inputs/2022/16/input.txt")),
+      (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")),
+      (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt")),
+      (202403, (Y2024Day03.runDay, "inputs/2024/03/input.txt")),
+      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt"))
     ]
 {- ORMOLU_ENABLE -}
 
