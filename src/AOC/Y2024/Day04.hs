@@ -1,10 +1,11 @@
 module AOC.Y2024.Day04 (runDay) where
 
-import Data.List (transpose)
-import Data.Maybe (fromJust, isNothing)
+import Data.List (transpose, zip4)
+import Data.Maybe (fromJust, isNothing, isJust)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, (<|>))
 import Text.Parsec.Text (Parser)
+import Util.Util ((!!?), both)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -28,8 +29,28 @@ data XMAS = X | M | A | S deriving (Eq, Show)
 type XMASTrio = (XMAS, XMAS, XMAS)
 
 type XMASNonet = (XMASTrio, XMASTrio, XMASTrio)
-
 ------------ UTIL --------------
+
+indexesOf4 :: [[(Int, Int)]]
+indexesOf4 = map (uncurry zip) $ concatMap (\x -> [x, both reverse x]) [(replicate 4 0, [0..3]), ([0..3], replicate 4 0), ([0..3], [0..3]), ([0..3], [3,2..0])]
+
+check4x4 :: [[XMAS]] -> [Bool]
+check4x4 grid = map (\idxs -> and [(grid !!? i >>= (!!? j)) == Just xmas | ((i, j), xmas) <- zip idxs [X,M,A,S] ]) indexesOf4
+
+checkAcross :: [[XMAS]] -> Int
+checkAcross [] = 0
+checkAcross grid
+    | all null grid = 0
+    | otherwise = sum (map fromEnum $ check4x4 grid) + checkAcross (map tail grid)
+
+safeTake :: Int -> [a] -> [a]
+safeTake 0 _ = []
+safeTake _ [] = []
+safeTake n (x:xs) = x:safeTake (n-1) xs
+
+checkDown :: [[XMAS]] -> Int
+checkDown [] = 0
+checkDown xs = checkAcross (safeTake 4 xs) + checkDown (tail xs)
 
 checkRow :: [XMAS] -> Int
 checkRow (X : M : A : S : rest) = 1 + checkRow (S : rest)
@@ -78,16 +99,7 @@ moving3x3WindowAccum2 _ = 0
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA x =
-  let (m, nums) = (length x, [0 .. m])
-   in sum
-        [ sum (map checkRow x),
-          sum (map checkRow (transpose x)),
-          sum (map checkRow2 (transpose $ (map . uncurry) shiftRowForwardByN (zip (map (map Just) x) nums))),
-          sum (map checkRow2 (transpose $ (map . uncurry) shiftRowForwardByN (zip (map (reverse . map Just) x) nums))),
-          sum (map checkRow2 (transpose $ (map . uncurry) shiftRowForwardByN (zip (map (map Just) x) (reverse nums)))),
-          sum (map checkRow2 (transpose $ (map . uncurry) shiftRowForwardByN (zip (map (reverse . map Just) x) (reverse nums))))
-        ]
+partA = checkDown
 
 ------------ PART B ------------
 partB :: Input -> OutputB
