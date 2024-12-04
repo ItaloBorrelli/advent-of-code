@@ -24,7 +24,7 @@ Then open VS Code and install recommended or desired extensions.
 
 ## Initialize day
 
-To get a day started, run `init_day.sh YYYY DD`. Or `cp .env.example .env` and set the `YEAR` and/or `DATE` value in there. It could be helpful to only set the year and run with the day parameter. In other words, set `export YEAR=20YY` in `.env` then run `init_day.sh DD`. With no day or year set, the current day and year will be used, which is useful when doing the challenges on a daily basis in December.
+To get a day started, run `./scripts/init_day.sh YYYY DD`. Or `cp .env.example .env` and set the `YEAR` and/or `DATE` value in there. It could be helpful to only set the year and run with the day parameter. In other words, set `export YEAR=20YY` in `.env` then run `./scripts/init_day.sh DD`. With no day or year set, the current day and year will be used, which is useful when doing the challenges on a daily basis in December.
 
 This creates `input.txt`, `test-answers.txt` and `test-input.txt` files in `inputs/YYYY/DD`, copies a template day as `src/AOC/Y${YYYY}/Day${DD}.hs` and adds lines to `Main.hs` and `Spec.hs` so that it is runnable through `stack run -- -d YYYYDD` and `stack test --test-arguments="--match=/AoC/YYYYDD/"`, which are also provided as scripts.
 
@@ -34,11 +34,11 @@ NOTE: The input files are not tracked, as requested by Eric Wastl on the [Advent
 
 ## Test day
 
-Put the example input given into `test-input.txt` and put the example output for part A and part B into the first and second line respectively of `test-answers.txt`. `./test_day.sh`. As with the `init_day` script, it can be run with or without the `YYYY DD` parameters, and you can use exports in `.env`.
+Put the example input given into `test-input.txt` and put the example output for part A and part B into the first and second line respectively of `test-answers.txt`. `./scripts/test_day.sh`. As with the `./scripts/init_day` script, it can be run with or without the `YYYY DD` parameters, and you can use exports in `.env`.
 
 ## Run day
 
-Once your tests pass, put your puzzle input into `input.txt` and run the day with `./run_day.sh`. As with the `init_day` and `test_day` scripts, it can be run with or without the `YYYY DD` parameters, and you can use exports in `.env`.
+Once your tests pass, put your puzzle input into `input.txt` and run the day with `./scripts/run_day.sh`. As with the `init_day` and `test_day` scripts, it can be run with or without the `YYYY DD` parameters, and you can use exports in `.env`.
 
 ## Other
 

@@ -2,8 +2,6 @@
 
 validate_date() {
     RESULT=0
-    year=$1
-    day=$2
 
     if [[ ! -z $year && ! $year =~ ^[0-9]{4}$ ]]; then
         echo "echo \"Invalid year: $year\""
@@ -59,7 +57,7 @@ if [[ -z $YEAR ]]; then
 fi
 
 if [[ -z $DAY ]]; then
-    DAY=${DAY:-$(date +%-d)}
+    DAY=${DAY:-$(date +%d)}
 fi
 
 # Output YEAR and DAY to be evaluated by the calling script
