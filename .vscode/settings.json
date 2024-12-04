@@ -1,7 +1,7 @@
 {
     "[haskell]": {
+        "editor.defaultFormatter": "haskell.haskell",
         // "editor.formatOnSave": true,
-        "editor.defaultFormatter": "haskell.haskell"
     },
     "haskell.manageHLS": "GHCup",
     "haskell.formattingProvider": "ormolu",
