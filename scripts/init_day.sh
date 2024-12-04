@@ -1,6 +1,6 @@
 #!/bin/bash
 
-eval "$(./resolve_date.sh "$@")"
+eval "$(./scripts/resolve_date.sh "$@")"
 
 echo "Year: $YEAR"
 echo "Day: $DAY"
