@@ -9,12 +9,23 @@ module Main (main) where
 -- Day imports
 import qualified AOC.Y2022.Day01 as Y2022Day01
 import qualified AOC.Y2022.Day02 as Y2022Day02
+import qualified AOC.Y2022.Day03 as Y2022Day03
+import qualified AOC.Y2022.Day04 as Y2022Day04
+import qualified AOC.Y2022.Day05 as Y2022Day05
+import qualified AOC.Y2022.Day06 as Y2022Day06
+import qualified AOC.Y2022.Day07 as Y2022Day07
+import qualified AOC.Y2022.Day08 as Y2022Day08
+import qualified AOC.Y2022.Day09 as Y2022Day09
+import qualified AOC.Y2022.Day10 as Y2022Day10
+import qualified AOC.Y2022.Day11 as Y2022Day11
+import qualified AOC.Y2022.Day12 as Y2022Day12
+import qualified AOC.Y2022.Day13 as Y2022Day13
 import qualified AOC.Y2024.Day01 as Y2024Day01
 import qualified AOC.Y2024.Day02 as Y2024Day02
 import qualified AOC.Y2024.Day03 as Y2024Day03
 import qualified AOC.Y2024.Day04 as Y2024Day04
--- Other imports
 
+-- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
 import Data.List (intercalate)
@@ -132,7 +143,18 @@ days =
       (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")),
       (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt")),
       (202403, (Y2024Day03.runDay, "inputs/2024/03/input.txt")),
-      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt"))
+      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt")),
+      (202203, (Y2022Day03.runDay, "inputs/2022/03/input.txt")),
+      (202204, (Y2022Day04.runDay, "inputs/2022/04/input.txt")),
+      (202205, (Y2022Day05.runDay, "inputs/2022/05/input.txt")),
+      (202206, (Y2022Day06.runDay, "inputs/2022/06/input.txt")),
+      (202207, (Y2022Day07.runDay, "inputs/2022/07/input.txt")),
+      (202208, (Y2022Day08.runDay, "inputs/2022/08/input.txt")),
+      (202209, (Y2022Day09.runDay, "inputs/2022/09/input.txt")),
+      (202210, (Y2022Day10.runDay, "inputs/2022/10/input.txt")),
+      (202211, (Y2022Day11.runDay, "inputs/2022/11/input.txt")),
+      (202212, (Y2022Day12.runDay, "inputs/2022/12/input.txt")),
+      (202213, (Y2022Day13.runDay, "inputs/2022/13/input.txt"))
     ]
 {- ORMOLU_ENABLE -}
 
