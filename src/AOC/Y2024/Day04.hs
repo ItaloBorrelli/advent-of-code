@@ -46,7 +46,7 @@ shiftRowForwardByN (_:xs) n = shiftRowForwardByN (xs ++ [Nothing]) (n - 1)
 ------------ PART A ------------
 partA :: Input -> OutputA
 partA x =
-    let (m, nums) = (length x, [0..(m-1)])
+    let (m, nums) = (length x, [0..m])
     in sum [sum (map checkRow x)
     , sum (map checkRow (transpose x))
     , sum (map checkRow2 (transpose $ (map . uncurry) shiftRowForwardByN (zip (map (map Just) x) nums)))
