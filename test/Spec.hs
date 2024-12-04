@@ -53,6 +53,7 @@ main :: IO ()
 main = hspec $ do
   describe "AoC" $ do
     -- Add new tests here
+    it "202404" $ do runDay ("2024", "04")
     it "202403" $ do runDay ("2024", "03")
     it "202402" $ do runDay ("2024", "02")
     it "202401" $ do runDay ("2024", "01")
