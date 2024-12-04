@@ -20,6 +20,9 @@ import qualified AOC.Y2022.Day10 as Y2022Day10
 import qualified AOC.Y2022.Day11 as Y2022Day11
 import qualified AOC.Y2022.Day12 as Y2022Day12
 import qualified AOC.Y2022.Day13 as Y2022Day13
+import qualified AOC.Y2022.Day14 as Y2022Day14
+import qualified AOC.Y2022.Day15 as Y2022Day15
+import qualified AOC.Y2022.Day16 as Y2022Day16
 import qualified AOC.Y2024.Day01 as Y2024Day01
 import qualified AOC.Y2024.Day02 as Y2024Day02
 import qualified AOC.Y2024.Day03 as Y2024Day03
