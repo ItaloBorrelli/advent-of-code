@@ -13,7 +13,7 @@ import qualified AOC.Y2024.Day01 as Y2024Day01
 import qualified AOC.Y2024.Day02 as Y2024Day02
 import qualified AOC.Y2024.Day03 as Y2024Day03
 import qualified AOC.Y2024.Day04 as Y2024Day04
-
+import qualified AOC.Y2024.Day05 as Y2024Day05
 -- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
@@ -132,7 +132,8 @@ days =
       (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")),
       (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt")),
       (202403, (Y2024Day03.runDay, "inputs/2024/03/input.txt")),
-      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt"))
+      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt")),
+      (202405, (Y2024Day05.runDay, "inputs/2024/05/input.txt"))
     ]
 
 formatDay :: Int -> String
