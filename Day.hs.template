@@ -8,23 +8,25 @@ import           Text.Parsec.Text
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- PARSER ------------
-inputParser :: Parser Input
-inputParser = fail "Parser not yet implemented!"
-
------------- TYPES -------------
+----------- TYPES --------------
 type Input = Void
 
 type OutputA = Void
 
 type OutputB = Void
 
------------- UTIL --------------
+----------- PARSER -------------
 
------------- PART A ------------
+inputParser :: Parser Input
+inputParser = fail "Parser not yet implemented!"
+
+----------- PART A&B -----------
+
+----------- PART A -------------
+
 partA :: Input -> OutputA
 partA = error "Not implemented yet!"
 
------------- PART B ------------
+----------- PART B -------------
 partB :: Input -> OutputB
 partB = error "Not implemented yet!"
