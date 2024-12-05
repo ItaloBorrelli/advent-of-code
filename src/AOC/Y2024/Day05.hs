@@ -49,21 +49,14 @@ inputParser = do
 combineKeys :: [OrderRule] -> OrderMap
 combineKeys = fromListWith (++) . map (second (: []))
 
--- must query be before current in the ordering rules given m mapping an int to all pages that it MUST be after
-isPageBefore :: OrderMap -> Int -> Int -> Bool
-isPageBefore m current query = case m !? current of
-  Nothing -> False -- i.e. we don't know if there's any pages that explicitly come before this book so it's not violating current
-  Just prevPages ->
-    query `elem` prevPages -- if q is in prevPages then q is before current and therefore we fail
-      || any (\p -> isPageBefore m p query) prevPages -- but if it wasn't, we need to check if any of the prevPages lead to q
-
-areAnyPagesEarly :: OrderMap -> Int -> [Int] -> Bool
-areAnyPagesEarly _ _ [] = False
-areAnyPagesEarly m x ys = any (isPageBefore m x) ys
+shouldXBeAfterY :: OrderMap -> Int -> Int -> Bool
+shouldXBeAfterY m x y = case m !? y of
+  Nothing -> False
+  Just ls -> x `elem` ls
 
 isRowGood :: OrderMap -> PageUpdate -> Bool
 isRowGood _ [] = True
-isRowGood m (x : xs) = isRowGood m xs && not (areAnyPagesEarly m x xs)
+isRowGood m (x : xs) = isRowGood m xs && not (any (shouldXBeAfterY m x) xs)
 
 getMiddle :: PageUpdate -> Int
 getMiddle xs = xs !! (length xs `div` 2)
@@ -71,7 +64,7 @@ getMiddle xs = xs !! (length xs `div` 2)
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (rules, pages) = sum $ map (getMiddle . fst) $ filter snd $ zip pages (map (isRowGood (combineKeys $ map swap rules)) pages)
+partA (rules, pages) = sum $ map (getMiddle . fst) $ filter snd $ zip pages (map (isRowGood (combineKeys rules)) pages)
 
 ----------- PART B -------------
 
