@@ -9,6 +9,7 @@ runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
 ----------- TYPES --------------
+
 type Input = Void
 
 type OutputA = Void
@@ -28,5 +29,6 @@ partA :: Input -> OutputA
 partA = error "Not implemented yet!"
 
 ----------- PART B -------------
+
 partB :: Input -> OutputB
 partB = error "Not implemented yet!"
