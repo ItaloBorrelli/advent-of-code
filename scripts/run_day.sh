@@ -5,6 +5,8 @@ error_file=$(mktemp)
 
 additional_flags=""
 all_days_flag=false
+eval "$(./scripts/resolve_date.sh "$@")"
+
 for arg in "$@"; do
     if [[ "$arg" == "-a" || "$arg" == "--all-days" ]]; then
         all_days_flag=true
@@ -17,8 +19,6 @@ if [[ "$all_days_flag" == true ]]; then
     stack run -- --all-days $additional_flags
     exit 0
 fi
-
-eval "$(./scripts/resolve_date.sh "$@")"
 
 echo "Year: $YEAR"
 echo "Day: $DAY"
