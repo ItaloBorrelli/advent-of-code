@@ -6,6 +6,8 @@ module Util.Util
     traceShowIdWithContext,
     (!!?),
     mapBoundingBox,
+    both,
+    safeTake,
   )
 where
 
@@ -80,3 +82,13 @@ mapBoundingBox m =
     (maximum . fmap fst . Map.keys $ m)
     (minimum . fmap snd . Map.keys $ m)
     (maximum . fmap snd . Map.keys $ m)
+
+-- Applies a function to both the first and second part of a tuple.
+both :: (a -> b) -> (a, a) -> (b, b)
+both f (x, y) = (f x, f y)
+
+-- Takes as many as it can, returning a list of the given number or the length of the list, whichever is lower.
+safeTake :: Int -> [a] -> [a]
+safeTake 0 _ = []
+safeTake _ [] = []
+safeTake n (x : xs) = x : safeTake (n - 1) xs
