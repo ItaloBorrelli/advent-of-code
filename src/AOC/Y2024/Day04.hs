@@ -1,7 +1,6 @@
 module AOC.Y2024.Day04 (runDay) where
 
-import Data.List (transpose, zip4)
-import Data.Maybe (fromJust, isNothing, isJust)
+import Data.Maybe (fromJust, isNothing)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, (<|>))
 import Text.Parsec.Text (Parser)
@@ -37,70 +36,41 @@ indexesOf4 = map (uncurry zip) $ concatMap (\x -> [x, both reverse x]) [(replica
 check4x4 :: [[XMAS]] -> [Bool]
 check4x4 grid = map (\idxs -> and [(grid !!? i >>= (!!? j)) == Just xmas | ((i, j), xmas) <- zip idxs [X,M,A,S] ]) indexesOf4
 
-checkAcross :: [[XMAS]] -> Int
-checkAcross [] = 0
-checkAcross grid
+checkAcross1 :: [[XMAS]] -> Int
+checkAcross1 [] = 0
+checkAcross1 grid
     | all null grid = 0
-    | otherwise = sum (map fromEnum $ check4x4 grid) + checkAcross (map tail grid)
+    | otherwise = sum (map fromEnum $ check4x4 grid) + checkAcross1 (map tail grid)
 
 safeTake :: Int -> [a] -> [a]
 safeTake 0 _ = []
 safeTake _ [] = []
 safeTake n (x:xs) = x:safeTake (n-1) xs
 
+checkDown1 :: [[XMAS]] -> Int
+checkDown1 [] = 0
+checkDown1 xs = checkAcross1 (safeTake 4 xs) + checkDown1 (tail xs)
+
+indexesGiveMAS :: [(Int, Int)] -> [[XMAS]] -> Bool
+indexesGiveMAS idxs grid = and [(grid !!? i >>= (!!? j)) == Just mas | ((i, j), mas) <- zip idxs [M,A,S]]
+
+checkMASInX :: [[XMAS]] -> Bool
+checkMASInX grid = (indexesGiveMAS (zip [0..2] [0..2]) grid || indexesGiveMAS (zip [2,1,0] [2,1,0]) grid) && (indexesGiveMAS (zip [0..2] [2,1,0]) grid || indexesGiveMAS (zip [2,1,0] [0..2]) grid)
+
+checkAcross :: [[XMAS]] -> Int
+checkAcross [] = 0
+checkAcross grid
+    | all null grid = 0
+    | otherwise = fromEnum (checkMASInX grid) + checkAcross (map tail grid)
+
 checkDown :: [[XMAS]] -> Int
 checkDown [] = 0
-checkDown xs = checkAcross (safeTake 4 xs) + checkDown (tail xs)
-
-checkRow :: [XMAS] -> Int
-checkRow (X : M : A : S : rest) = 1 + checkRow (S : rest)
-checkRow (S : A : M : X : rest) = 1 + checkRow (X : rest)
-checkRow (_ : rest) = checkRow rest
-checkRow _ = 0
-
-checkRow2 :: [Maybe XMAS] -> Int
-checkRow2 (Just X : Just M : Just A : Just S : rest) = 1 + checkRow2 (Just S : rest)
-checkRow2 (Just S : Just A : Just M : Just X : rest) = 1 + checkRow2 (Just X : rest)
-checkRow2 (_ : rest) = checkRow2 rest
-checkRow2 _ = 0
-
-shiftRowForwardByN :: [Maybe XMAS] -> Int -> [Maybe XMAS]
-shiftRowForwardByN [] _ = []
-shiftRowForwardByN xs 0 = xs
-shiftRowForwardByN (_ : xs) n = shiftRowForwardByN (xs ++ [Nothing]) (n - 1)
-
-first3 :: [XMAS] -> Maybe XMASTrio
-first3 (x : y : z : _) = Just (x, y, z)
-first3 _ = Nothing
-
-firstNonet :: [[XMAS]] -> Maybe XMASNonet
-firstNonet (x : y : z : _) = do
-  a <- first3 x
-  b <- first3 y
-  c <- first3 z
-  return (a, b, c)
-firstNonet _ = Nothing
-
-checkNonet :: XMASNonet -> Bool
-checkNonet ((x1, _, x3), (_, A, _), (z1, _, z3)) = ((x1 == M && z3 == S) || (x1 == S && z3 == M)) && ((x3 == M && z1 == S) || (x3 == S && z1 == M))
-checkNonet _ = False
-
-moving3x3WindowAccum :: [[XMAS]] -> Int
-moving3x3WindowAccum [[], [], []] = 0
-moving3x3WindowAccum (x : xs) =
-  let non = firstNonet (x : xs)
-      good = if isNothing non then 0 else fromEnum (checkNonet (fromJust non))
-   in good + moving3x3WindowAccum (map tail (x : xs))
-moving3x3WindowAccum _ = 0
-
-moving3x3WindowAccum2 :: [[XMAS]] -> Int
-moving3x3WindowAccum2 (x : y : z : rest) = moving3x3WindowAccum [x, y, z] + moving3x3WindowAccum2 (y : z : rest)
-moving3x3WindowAccum2 _ = 0
+checkDown xs = checkAcross (safeTake 3 xs) + checkDown (tail xs)
 
 ------------ PART A ------------
 partA :: Input -> OutputA
-partA = checkDown
+partA = checkDown1
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = moving3x3WindowAccum2
+partB = checkDown
