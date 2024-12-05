@@ -4,7 +4,7 @@ import Control.Monad.Combinators (sepEndBy)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, many, newline, (<|>))
 import Text.Parsec.Text (Parser)
-import Util.Util (both, (!!?))
+import Util.Util (both, safeTake, (!!?))
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -28,11 +28,6 @@ inputParser :: Parser Input
 inputParser = parseLine `sepEndBy` newline
 
 ----------- PART A&B -----------
-
-safeTake :: Int -> [a] -> [a]
-safeTake 0 _ = []
-safeTake _ [] = []
-safeTake n (x : xs) = x : safeTake (n - 1) xs
 
 checkLeftToRight :: ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkLeftToRight _ [] = 0
