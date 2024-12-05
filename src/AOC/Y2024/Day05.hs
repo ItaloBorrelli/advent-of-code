@@ -1,12 +1,16 @@
 module AOC.Y2024.Day05 (runDay) where
 
 import Control.Arrow (Arrow (second))
+import Control.Monad (guard, liftM)
+import Control.Monad.Combinators ((<|>))
+import Data.Aviary.Birds (cardinal, goldfinch)
+import Data.Functor (($>))
 import Data.List (sortBy)
 import Data.Map.Strict (Map, fromListWith, (!?))
+import Data.Maybe (fromMaybe)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, digit, endBy, many1, newline, sepBy, eof)
+import Text.Parsec (char, digit, endBy, eof, many1, newline, sepBy)
 import Text.Parsec.Text (Parser)
-import Data.Aviary.Birds (goldfinch, cardinal)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -47,14 +51,13 @@ middle :: Page -> Int
 middle xs = xs !! (length xs `div` 2)
 
 pageOrder :: RulesMap -> Int -> Int -> Ordering
-pageOrder m a b = case m !? a of
-          Just aNext | b `elem` aNext -> LT
-          _ -> case m !? b of
-            Just bNext | a `elem` bNext -> GT
-            _ -> EQ
+pageOrder m a b =
+  fromMaybe EQ $
+    ((guard . (b `elem`)) =<< m !? a) $> LT
+      <|> ((guard . (a `elem`)) =<< m !? b) $> GT
 
 sortPage :: RulesMap -> Page -> Page
-sortPage = sortBy . pageOrder 
+sortPage = sortBy . pageOrder
 
 sortAndCheck :: RulesMap -> Page -> SortResult
 sortAndCheck m orig = (\result -> (result, result == orig)) $ sortPage m orig
