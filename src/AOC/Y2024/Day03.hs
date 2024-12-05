@@ -16,7 +16,18 @@ import Text.Parsec.Text (Parser)
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- PARSER ------------
+----------- TYPES --------------
+
+type Input = [Commands]
+
+type OutputA = Int
+
+type OutputB = Int
+
+data Commands = Mul (Int, Int) | Junk Char | Enable | Disable deriving (Show)
+
+----------- PARSER -------------
+
 parseMul :: Parser (Int, Int)
 parseMul =
   string "mul("
@@ -33,16 +44,8 @@ inputParser =
         <|> (Junk <$> anyChar)
     )
 
------------- TYPES -------------
-type Input = [Commands]
+----------- PART A&B -----------
 
-type OutputA = Int
-
-type OutputB = Int
-
-data Commands = Mul (Int, Int) | Junk Char | Enable | Disable deriving (Show)
-
------------- UTIL --------------
 multMults :: Commands -> Int
 multMults (Mul (a, b)) = a * b
 multMults _ = 0
@@ -55,10 +58,12 @@ filterMults True (Mul x : xs) = x : filterMults True xs
 filterMults True (_ : xs) = filterMults True xs
 filterMults _ [] = []
 
------------- PART A ------------
+----------- PART A -------------
+
 partA :: Input -> OutputA
 partA = sum . map multMults
 
------------- PART B ------------
+----------- PART B -------------
+
 partB :: Input -> OutputB
 partB = sum . map (uncurry (*)) . filterMults True

@@ -10,18 +10,20 @@ import Text.Parsec.Text (Parser)
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- PARSER ------------
-inputParser :: Parser Input
-inputParser = optional (read <$> many1 digit) `sepEndBy` newline
+----------- TYPES --------------
 
------------- TYPES -------------
 type Input = [Maybe Int]
 
 type OutputA = Int
 
 type OutputB = Int
 
------------- UTIL --------------
+----------- PARSER -------------
+
+inputParser :: Parser Input
+inputParser = optional (read <$> many1 digit) `sepEndBy` newline
+
+----------- PART A&B -----------
 
 splitSum :: Input -> [Int]
 splitSum = foldr f []
@@ -36,16 +38,18 @@ insertIfLarger x (y : ys)
   | x >= y = x : y : ys
   | otherwise = y : insertIfLarger x ys
 
+----------- PART A -------------
+
+partA :: Input -> OutputA
+partA = maximum . splitSum
+
+----------- PART B -------------
+
 insertTopThree :: (Ord a) => [a] -> a -> [a]
 insertTopThree top x = take 3 $ insertIfLarger x top
 
 threeLargest :: (Ord a) => [a] -> [a]
 threeLargest = foldl insertTopThree []
 
------------- PART A ------------
-partA :: Input -> OutputA
-partA = maximum . splitSum
-
------------- PART B ------------
 partB :: Input -> OutputB
 partB = sum . threeLargest . splitSum
