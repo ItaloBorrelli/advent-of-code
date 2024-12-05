@@ -1,9 +1,9 @@
 module AOC.Y2024.Day05 (runDay) where
 
 import Control.Arrow (Arrow (second))
+import Data.List (sortBy)
 import Data.Map.Strict (Map, fromListWith, (!?))
-import Data.Tuple (swap)
-import Data.Void (Void)
+import Data.Maybe (isJust, isNothing)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, digit, endBy, eof, many1, newline, sepBy)
 import Text.Parsec.Text (Parser)
@@ -23,7 +23,7 @@ type Input = ([OrderRule], [PageUpdate])
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ----------- PARSER -------------
 
@@ -61,12 +61,29 @@ isRowGood m (x : xs) = isRowGood m xs && not (any (shouldXBeAfterY m x) xs)
 getMiddle :: PageUpdate -> Int
 getMiddle xs = xs !! (length xs `div` 2)
 
+pagesAndOrderResult :: OrderMap -> [PageUpdate] -> [(PageUpdate, Bool)]
+pagesAndOrderResult m ps = zip ps (map (isRowGood m) ps)
+
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (rules, pages) = sum $ map (getMiddle . fst) $ filter snd $ zip pages (map (isRowGood (combineKeys rules)) pages)
+partA (rules, pages) = sum $ map (getMiddle . fst) $ filter snd $ pagesAndOrderResult (combineKeys rules) pages
 
 ----------- PART B -------------
 
+fixPage :: OrderMap -> [Int] -> PageUpdate
+fixPage m =
+  sortBy
+    ( \a b ->
+        case m !? a of
+          Just aNext | b `elem` aNext -> LT
+          _ -> case m !? b of
+            Just bNext | a `elem` bNext -> GT
+            _ -> EQ
+    )
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB (rules, pages) =
+  let orderMap = combineKeys rules
+      badPages = filter (not . snd) $ pagesAndOrderResult orderMap pages
+   in sum $ map (getMiddle . fixPage orderMap . fst) badPages
