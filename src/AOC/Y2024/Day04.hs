@@ -9,7 +9,7 @@ import Util.Util (both, (!!?))
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- TYPES -------------
+----------- TYPES --------------
 
 type Input = [[XMAS]]
 
@@ -19,7 +19,7 @@ type OutputB = Int
 
 data XMAS = X | M | A | S deriving (Eq, Show)
 
------------- PARSER ------------
+----------- PARSER -------------
 
 parseLine :: Parser [XMAS]
 parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S'))
@@ -27,7 +27,7 @@ parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S
 inputParser :: Parser Input
 inputParser = parseLine `sepEndBy` newline
 
------------- UTIL --------------
+----------- PART A&B -----------
 
 safeTake :: Int -> [a] -> [a]
 safeTake 0 _ = []
@@ -44,7 +44,7 @@ checkTopToBottom :: Int -> ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkTopToBottom _ _ [] = 0
 checkTopToBottom windowSize evaluate xs = checkLeftToRight evaluate (safeTake windowSize xs) + checkTopToBottom windowSize evaluate (tail xs)
 
------------- PART A ------------
+----------- PART A -------------
 
 zs4 :: [Int]
 zs4 = replicate 4 0
@@ -61,7 +61,7 @@ check4x4 grid = sum $ map (fromEnum . (\idxs -> and [(grid !!? i >>= (!!? j)) ==
 partA :: Input -> OutputA
 partA = checkTopToBottom 4 check4x4
 
------------- PART B ------------
+----------- PART B -------------
 
 zTo2 :: [Int]
 zTo2 = [0 .. 2]
