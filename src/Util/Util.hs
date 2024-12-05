@@ -6,7 +6,7 @@ module Util.Util
     traceShowIdWithContext,
     (!!?),
     mapBoundingBox,
-    both
+    both,
   )
 where
 
