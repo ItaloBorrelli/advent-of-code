@@ -39,7 +39,7 @@ checkTopToBottom :: Int -> ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkTopToBottom _ _ [] = 0
 checkTopToBottom windowSize evaluate xs = checkLeftToRight evaluate (safeTake windowSize xs) + checkTopToBottom windowSize evaluate (tail xs)
 
-areValuesAtIndexes :: Eq a => [a] -> [[a]] -> [(Int, Int)] -> Bool
+areValuesAtIndexes :: (Eq a) => [a] -> [[a]] -> [(Int, Int)] -> Bool
 areValuesAtIndexes values grid idxs = and [(grid !!? i >>= (!!? j)) == Just current | ((i, j), current) <- zip idxs values]
 
 ----------- PART A -------------
