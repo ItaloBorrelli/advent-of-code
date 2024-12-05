@@ -39,6 +39,9 @@ checkTopToBottom :: Int -> ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkTopToBottom _ _ [] = 0
 checkTopToBottom windowSize evaluate xs = checkLeftToRight evaluate (safeTake windowSize xs) + checkTopToBottom windowSize evaluate (tail xs)
 
+areValuesAtIndexes :: Eq a => [a] -> [[a]] -> [(Int, Int)] -> Bool
+areValuesAtIndexes values grid idxs = and [(grid !!? i >>= (!!? j)) == Just current | ((i, j), current) <- zip idxs values]
+
 ----------- PART A -------------
 
 zs4 :: [Int]
@@ -51,7 +54,7 @@ indexesOf4 :: [[(Int, Int)]]
 indexesOf4 = map (uncurry zip) $ concatMap (\x -> [x, both reverse x]) [(zs4, zTo3), (zTo3, zs4), (zTo3, zTo3), (zTo3, reverse zTo3)]
 
 check4x4 :: [[XMAS]] -> Int
-check4x4 grid = sum $ map (fromEnum . (\idxs -> and [(grid !!? i >>= (!!? j)) == Just xmas | ((i, j), xmas) <- zip idxs [X, M, A, S]])) indexesOf4
+check4x4 grid = sum $ map (fromEnum . areValuesAtIndexes [X, M, A, S] grid) indexesOf4
 
 partA :: Input -> OutputA
 partA = checkTopToBottom 4 check4x4
@@ -65,7 +68,7 @@ twoTo0 :: [Int]
 twoTo0 = [2, 1, 0]
 
 doIndexesGiveMAS :: [[XMAS]] -> [(Int, Int)] -> Bool
-doIndexesGiveMAS grid idxs = and [(grid !!? i >>= (!!? j)) == Just mas | ((i, j), mas) <- zip idxs [M, A, S]]
+doIndexesGiveMAS = areValuesAtIndexes [M, A, S]
 
 checkMASInX :: [[XMAS]] -> Bool
 checkMASInX grid =
