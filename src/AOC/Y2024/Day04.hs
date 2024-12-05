@@ -1,7 +1,8 @@
 module AOC.Y2024.Day04 (runDay) where
 
+import Control.Monad.Combinators (sepEndBy)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, eof, many, newline, (<|>))
+import Text.Parsec (char, many, newline, (<|>))
 import Text.Parsec.Text (Parser)
 import Util.Util (both, (!!?))
 
@@ -21,10 +22,10 @@ data XMAS = X | M | A | S deriving (Eq, Show)
 ------------ PARSER ------------
 
 parseLine :: Parser [XMAS]
-parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S')) <* newline
+parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S'))
 
 inputParser :: Parser Input
-inputParser = many parseLine <* eof
+inputParser = parseLine `sepEndBy` newline
 
 ------------ UTIL --------------
 
@@ -45,8 +46,14 @@ checkTopToBottom windowSize evaluate xs = checkLeftToRight evaluate (safeTake wi
 
 ------------ PART A ------------
 
+zs4 :: [Int]
+zs4 = replicate 4 0
+
+zTo3 :: [Int]
+zTo3 = [0 .. 3]
+
 indexesOf4 :: [[(Int, Int)]]
-indexesOf4 = map (uncurry zip) $ concatMap (\x -> [x, both reverse x]) [(replicate 4 0, [0 .. 3]), ([0 .. 3], replicate 4 0), ([0 .. 3], [0 .. 3]), ([0 .. 3], [3, 2 .. 0])]
+indexesOf4 = map (uncurry zip) $ concatMap (\x -> [x, both reverse x]) [(zs4, zTo3), (zTo3, zs4), (zTo3, zTo3), (zTo3, reverse zTo3)]
 
 check4x4 :: [[XMAS]] -> Int
 check4x4 grid = sum $ map (fromEnum . (\idxs -> and [(grid !!? i >>= (!!? j)) == Just xmas | ((i, j), xmas) <- zip idxs [X, M, A, S]])) indexesOf4
@@ -56,11 +63,26 @@ partA = checkTopToBottom 4 check4x4
 
 ------------ PART B ------------
 
+zTo2 :: [Int]
+zTo2 = [0 .. 2]
+
+twoTo0 :: [Int]
+twoTo0 = [2, 1, 0]
+
 doIndexesGiveMAS :: [[XMAS]] -> [(Int, Int)] -> Bool
 doIndexesGiveMAS grid idxs = and [(grid !!? i >>= (!!? j)) == Just mas | ((i, j), mas) <- zip idxs [M, A, S]]
 
 checkMASInX :: [[XMAS]] -> Bool
-checkMASInX grid = all (any (doIndexesGiveMAS grid)) [[zip [0 .. 2] [0 .. 2], zip [2, 1, 0] [2, 1, 0]], [zip [0 .. 2] [2, 1, 0], zip [2, 1, 0] [0 .. 2]]]
+checkMASInX grid =
+  all
+    (any (doIndexesGiveMAS grid))
+    [ [ zip zTo2 zTo2,
+        zip twoTo0 twoTo0
+      ],
+      [ zip zTo2 twoTo0,
+        zip twoTo0 zTo2
+      ]
+    ]
 
 partB :: Input -> OutputB
 partB = checkTopToBottom 3 (fromEnum . checkMASInX)
