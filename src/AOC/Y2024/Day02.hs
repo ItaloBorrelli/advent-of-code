@@ -10,11 +10,8 @@ import Text.Parsec.Text (Parser)
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- PARSER ------------
-inputParser :: Parser Input
-inputParser = (read <$> many1 digit) `sepBy` char ' ' `sepBy` newline
+----------- TYPES --------------
 
------------- TYPES -------------
 type Input = [[Int]]
 
 type OutputA = Int
@@ -29,7 +26,13 @@ instance Eq Dir where
   Dec == Inc = False
   _ == _ = True
 
------------- UTIL --------------
+----------- PARSER -------------
+
+inputParser :: Parser Input
+inputParser = (read <$> many1 digit) `sepBy` char ' ' `sepBy` newline
+
+----------- PART A&B -----------
+
 withinLimits :: Int -> Bool
 withinLimits = uncurry (&&) . ((>= 1) &&& (<= 3)) . abs
 
@@ -55,10 +58,12 @@ isSafeAfterRemoval firstInc (Just prev) (x : xs) hasFailure =
   (\d -> withinLimits d && monotonic d (fromMaybe d firstInc) && isSafeAfterRemoval (Just d) (Just x) xs hasFailure) (x - prev) || (not hasFailure && isSafeAfterRemoval Nothing (Just prev) xs True)
 isSafeAfterRemoval _ _ _ _ = True
 
------------- PART A ------------
+----------- PART A -------------
+
 partA :: Input -> OutputA
 partA = length . filter id . map (isSafe None)
 
------------- PART B ------------
+----------- PART B -------------
+
 partB :: Input -> OutputB
 partB = length . filter id . map (flip (isSafeAfterRemoval Nothing Nothing) False)

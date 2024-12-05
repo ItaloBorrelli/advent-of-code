@@ -9,18 +9,21 @@ import Text.Parsec.Text (Parser)
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- PARSER ------------
+----------- PARSER -------------
+
 inputParser :: Parser Input
 inputParser = (((,) . read <$> many1 digit) <* many1 space <*> (read <$> many1 digit)) `sepEndBy` newline
 
------------- TYPES -------------
+----------- TYPES --------------
+
 type Input = [(Int, Int)]
 
 type OutputA = Int
 
 type OutputB = Int
 
------------- UTIL --------------
+----------- PART A&B -----------
+
 findAndRemoveMin :: Input -> (Input, (Int, Int))
 findAndRemoveMin [] = error "Empty list"
 findAndRemoveMin [(m1, m2)] = ([], (m1, m2))
@@ -42,7 +45,8 @@ countAndRemoveLeft (x : xs) ys =
       new_val = (x * (1 + countInLeft) * countInRight)
    in new_val + countAndRemoveLeft xs' ys'
 
------------- PART A ------------
+----------- PART A -------------
+
 partA :: Input -> OutputA
 partA = go 0
   where
@@ -51,6 +55,7 @@ partA = go 0
           new_sum = abs (m1 - m2) + dist_sums
        in if null xs' then new_sum else go new_sum xs'
 
------------- PART B ------------
+----------- PART B -------------
+
 partB :: Input -> OutputB
 partB = uncurry countAndRemoveLeft . unzip

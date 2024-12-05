@@ -8,14 +8,8 @@ import Text.Parsec.Text (Parser)
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
------------- PARSER ------------
-charSpaceChar :: Parser (Char, Char)
-charSpaceChar = liftM2 (,) anyChar (char ' ' >> anyChar)
+----------- TYPES --------------
 
-inputParser :: Parser Input
-inputParser = charSpaceChar `sepEndBy` newline
-
------------- TYPES -------------
 type Input = [(Char, Char)]
 
 type OutputA = Int
@@ -32,7 +26,15 @@ type Match1 = (Shape, Shape)
 
 type Match2 = (Shape, Result)
 
------------- UTIL --------------
+----------- PARSER -------------
+
+charSpaceChar :: Parser (Char, Char)
+charSpaceChar = liftM2 (,) anyChar (char ' ' >> anyChar)
+
+inputParser :: Parser Input
+inputParser = charSpaceChar `sepEndBy` newline
+
+----------- PART A&B -----------
 
 pointsForResult :: Result -> Int
 pointsForResult Win = 6
@@ -69,10 +71,12 @@ match2 (x, 'Y') = (toShape x, Draw)
 match2 (x, 'Z') = (toShape x, Win)
 match2 (_, _) = error "Invalid result in input"
 
------------- PART A ------------
+----------- PART A -------------
+
 partA :: Input -> OutputA
 partA = sum . map ((\(a, b) -> pointsForShape b + pointsForResult (result (a, b))) . match1)
 
------------- PART B ------------
+----------- PART B -------------
+
 partB :: Input -> OutputB
 partB = sum . map ((\(a, b) -> pointsForResult b + pointsForShape (head [s | s <- [Rock, Paper, Scissors], result (a, s) == b])) . match2)
