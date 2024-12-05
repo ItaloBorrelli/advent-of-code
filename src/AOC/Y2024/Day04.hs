@@ -1,8 +1,7 @@
 module AOC.Y2024.Day04 (runDay) where
 
-import Control.Monad.Combinators (sepEndBy)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, many, newline, (<|>))
+import Text.Parsec (char, many, newline, (<|>), endBy)
 import Text.Parsec.Text (Parser)
 import Util.Util (both, safeTake, (!!?))
 
@@ -25,7 +24,7 @@ parseLine :: Parser [XMAS]
 parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S'))
 
 inputParser :: Parser Input
-inputParser = parseLine `sepEndBy` newline
+inputParser = parseLine `endBy` newline
 
 ----------- PART A&B -----------
 
@@ -51,7 +50,7 @@ zTo3 :: [Int]
 zTo3 = [0 .. 3]
 
 indexesOf4 :: [[(Int, Int)]]
-indexesOf4 = map (uncurry zip) $ concatMap (\x -> [x, both reverse x]) [(zs4, zTo3), (zTo3, zs4), (zTo3, zTo3), (zTo3, reverse zTo3)]
+indexesOf4 = uncurry zip <$> concatMap (\x -> [x, both reverse x]) [(zs4, zTo3), (zTo3, zs4), (zTo3, zTo3), (zTo3, reverse zTo3)]
 
 check4x4 :: [[XMAS]] -> Int
 check4x4 grid = sum $ map (fromEnum . areValuesAtIndexes [X, M, A, S] grid) indexesOf4
@@ -72,15 +71,8 @@ doIndexesGiveMAS = areValuesAtIndexes [M, A, S]
 
 checkMASInX :: [[XMAS]] -> Bool
 checkMASInX grid =
-  all
-    (any (doIndexesGiveMAS grid))
-    [ [ zip zTo2 zTo2,
-        zip twoTo0 twoTo0
-      ],
-      [ zip zTo2 twoTo0,
-        zip twoTo0 zTo2
-      ]
-    ]
+  all (any (doIndexesGiveMAS grid . uncurry zip)) [[(zTo2, zTo2), (twoTo0, twoTo0)],
+     [(zTo2, twoTo0), (twoTo0, zTo2)]]
 
 partB :: Input -> OutputB
 partB = checkTopToBottom 3 (fromEnum . checkMASInX)
