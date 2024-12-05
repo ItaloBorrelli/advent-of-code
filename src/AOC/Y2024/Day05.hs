@@ -1,7 +1,7 @@
 module AOC.Y2024.Day05 (runDay) where
 
 import Control.Arrow (Arrow (second))
-import Control.Monad (guard, liftM)
+import Control.Monad (guard)
 import Control.Monad.Combinators ((<|>))
 import Data.Aviary.Birds (cardinal, goldfinch)
 import Data.Functor (($>))
