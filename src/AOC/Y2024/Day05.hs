@@ -49,29 +49,10 @@ inputParser = do
 combineKeys :: [OrderRule] -> OrderMap
 combineKeys = fromListWith (++) . map (second (: []))
 
-shouldXBeAfterY :: OrderMap -> Int -> Int -> Bool
-shouldXBeAfterY m x y = case m !? y of
-  Nothing -> False
-  Just ls -> x `elem` ls
-
-isRowGood :: OrderMap -> PageUpdate -> Bool
-isRowGood _ [] = True
-isRowGood m (x : xs) = isRowGood m xs && not (any (shouldXBeAfterY m x) xs)
-
 getMiddle :: PageUpdate -> Int
 getMiddle xs = xs !! (length xs `div` 2)
 
-pagesAndOrderResult :: OrderMap -> [PageUpdate] -> [(PageUpdate, Bool)]
-pagesAndOrderResult m ps = zip ps (map (isRowGood m) ps)
-
------------ PART A -------------
-
-partA :: Input -> OutputA
-partA (rules, pages) = sum $ map (getMiddle . fst) $ filter snd $ pagesAndOrderResult (combineKeys rules) pages
-
------------ PART B -------------
-
-fixPage :: OrderMap -> [Int] -> PageUpdate
+fixPage :: OrderMap -> PageUpdate -> PageUpdate
 fixPage m =
   sortBy
     ( \a b ->
@@ -82,8 +63,15 @@ fixPage m =
             _ -> EQ
     )
 
+fixAndRecordDiff :: OrderMap -> PageUpdate -> (PageUpdate, Bool)
+fixAndRecordDiff m orig = (\result -> (result, result == orig)) $ fixPage m orig
+
+----------- PART A -------------
+
+partA :: Input -> OutputA
+partA (rules, pages) = sum $ map (getMiddle . fst) $ filter snd $ map (fixAndRecordDiff (combineKeys rules)) pages
+
+----------- PART B -------------
+
 partB :: Input -> OutputB
-partB (rules, pages) =
-  let orderMap = combineKeys rules
-      badPages = filter (not . snd) $ pagesAndOrderResult orderMap pages
-   in sum $ map (getMiddle . fixPage orderMap . fst) badPages
+partB (rules, pages) = sum $ map (getMiddle . fst) $ filter (not . snd) $ map (fixAndRecordDiff (combineKeys rules)) pages
