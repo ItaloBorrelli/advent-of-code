@@ -60,7 +60,7 @@ sortPage :: RulesMap -> Page -> Page
 sortPage = sortBy . pageOrder
 
 sortAndCheck :: RulesMap -> Page -> SortResult
-sortAndCheck m orig = (\result -> (result, result == orig)) $ sortPage m orig
+sortAndCheck m orig = (\f -> (f, f == orig)) $ sortPage m orig
 
 avianPageSort :: [Rule] -> [Page] -> [SortResult]
 avianPageSort = map . goldfinch (cardinal sortAndCheck) toMap
