@@ -1,9 +1,10 @@
 module AOC.Y2024.Day04 (runDay) where
 
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, endBy, many, newline, (<|>))
+import Text.Parsec (char, many, newline, (<|>), eof)
 import Text.Parsec.Text (Parser)
 import Util.Util (both, safeTake, (!!?))
+import Text.Parsec.Combinator (sepBy)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -24,7 +25,7 @@ parseLine :: Parser [XMAS]
 parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S'))
 
 inputParser :: Parser Input
-inputParser = parseLine `endBy` newline
+inputParser = filter (not . null) <$> parseLine `sepBy` newline <* eof
 
 ----------- PART A&B -----------
 
