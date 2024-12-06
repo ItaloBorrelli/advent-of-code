@@ -48,7 +48,7 @@ type S = C
 -- Map of Coordinates to Spots
 type M = Map C Spot
 
-data D = Up | Do | Le | Ri deriving (Show)
+data D = Up | Do | Le | Ri deriving (Eq, Ord, Show)
 
 -- Axis of Vertical or Horizontal
 data A = V | H deriving (Eq, Ord)
@@ -56,7 +56,7 @@ data A = V | H deriving (Eq, Ord)
 -- Line of Axis and respectively:
 -- | Horizontal -> the y value and the x value of last empty spot left<->right
 -- | Vertical -> the x value and the y value of last empty spot up<->down
-type L = Map (A, Int) (Set (Int, Int))
+type L = Map (D, Int) (Set (Int, Int))
 
 ----------- PARSER -------------
 
@@ -102,24 +102,24 @@ findNextObstruction m c d =
         Just Ob -> c
         _ -> findNextObstruction m c' d
 
-getAxis :: D -> A
-getAxis Le = H
-getAxis Ri = H
-getAxis Up = V
-getAxis Do = V
+onLine :: L -> C -> D -> Bool
+onLine ls (x, y) Le = maybe False (any (\(x1, x2) -> x1 <= x && x2 >= x)) (ls !? (Le, y))
+onLine ls (x, y) Ri = maybe False (any (\(x1, x2) -> x1 <= x && x2 >= x)) (ls !? (Ri, y))
+onLine ls (x, y) Up = maybe False (any (\(x1, x2) -> x1 <= y && x2 >= y)) (ls !? (Up, x))
+onLine ls (x, y) Do = maybe False (any (\(x1, x2) -> x1 <= y && x2 >= y)) (ls !? (Do, x))
 
-onLine :: L -> C -> A -> Bool
-onLine ls (x, y) H = maybe False (any (\(x1, x2) -> x1 <= x && x2 >= x)) (ls !? (H, y))
-onLine ls (x, y) V = maybe False (any (\(x1, x2) -> x1 <= y && x2 >= y)) (ls !? (V, x))
-
-recordLine :: M -> C -> A -> L -> L
-recordLine m (x, y) H = insertWith union (H, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri)))
-recordLine m (x, y) V = insertWith union (V, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do)))
+recordLine :: M -> C -> D -> L -> L
+recordLine m (x, y) Le = insertWith union (Le, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri)))
+recordLine m (x, y) Ri = insertWith union (Ri, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri)))
+recordLine m (x, y) Up = insertWith union (Up, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do)))
+recordLine m (x, y) Do = insertWith union (Do, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do)))
 
 visit :: M -> L -> C -> D -> (Int, Int) -> (M, L, Int, Int)
-visit m ls c d (v, o) = case m !? c of
-  Just Vi -> (m, ls, v, o)
-  _ -> (insert c Vi m, recordLine m c (getAxis d) ls, v + 1, o + fromEnum (onLine ls c (getAxis $ turn d)))
+visit m ls c d (v, o) =
+  let (ls', obs, o') = (recordLine m c d ls, onLine ls c (turn d), fromEnum obs + o)
+  in case m !? c of
+    Just Vi -> (m, ls', v, o')
+    _ -> (insert c Vi m, ls', v + 1, o')
 
 doRounds :: M -> L -> C -> D -> (Int, Int) -> (Int, Int)
 doRounds m ls c d (v, o) =
