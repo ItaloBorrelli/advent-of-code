@@ -15,88 +15,95 @@ runDay = R.runDay inputParser partA partB
 
 ----------- TYPES --------------
 
-data Spot = V | O | E deriving (Eq)
+-- Vi: Visited
+-- Ob: Obstruction
+-- Em: Empty
+data Spot = Vi | Ob | Em deriving (Eq)
 
 instance Show Spot where
   show :: Spot -> String
-  show O = "#"
-  show E = "."
-  show V = "X"
+  show Ob = "#"
+  show Em = "."
+  show Vi = "X"
 
 instance IsString Spot where
   fromString :: String -> Spot
-  fromString "#" = O
-  fromString "." = E
-  fromString _ = V
+  fromString "#" = Ob
+  fromString "." = Em
+  fromString _ = Vi
 
-type Input = [[Spot]]
+type Input = (C, M)
 
 type OutputA = Int
 
 type OutputB = Void
 
-type Coord = (Int, Int)
+-- Coordinate
+type C = (Int, Int)
 
-type Move = Coord
+-- Step
+type S = C
 
-type Chizu = Map Coord Spot
+-- Map of Coordinates to Spots
+type M = Map C Spot
 
-data Dir = U | D | L | R deriving (Show)
+data D = Up | Do | Le | Ri deriving (Show)
+
+
 
 ----------- PARSER -------------
 
+getStart :: [[Spot]] -> [(Int, Int)]
+getStart = concatMap (\(y, row) -> [(x, y) | (x, spot) <- zip [0 ..] row, spot == Vi]) . zip [0 ..]
+
 parseLine :: Parser [Spot]
-parseLine = many ((V <$ char '^') <|> (E <$ char '.') <|> (O <$ char '#'))
+parseLine = many ((Vi <$ char '^') <|> (Em <$ char '.') <|> (Ob <$ char '#'))
 
 inputParser :: Parser Input
-inputParser = filter (not . null) <$> (parseLine `sepBy` newline) <* eof
+inputParser = ((\g -> (head $ getStart g, mapFromNestedLists $ transpose g)) . filter (not . null) <$> (parseLine `sepBy` newline)) <* eof
 
 ----------- PART A&B -----------
 
-findStartInList :: [[Spot]] -> [(Int, Int)]
-findStartInList = concatMap (\(y, row) -> [(x, y) | (x, spot) <- zip [0 ..] row, spot == V]) . zip [0 ..]
+move :: D -> S
+move Up = (0, -1)
+move Do = (0, 1)
+move Ri = (1, 0)
+move Le = (-1, 0)
 
-move :: Dir -> Move
-move U = (0, -1)
-move D = (0, 1)
-move R = (1, 0)
-move L = (-1, 0)
+turn :: D -> D
+turn Le = Up
+turn Up = Ri
+turn Ri = Do
+turn Do = Le
 
-turn :: Dir -> Dir
-turn L = U
-turn U = R
-turn R = D
-turn D = L
+nextStep :: D -> C -> C
+nextStep d c = bimap (+ fst c) (+ snd c) (move d)
 
-whereTo :: Chizu -> (Dir, Coord) -> Maybe (Dir, Coord)
-whereTo m (d, curr) =
-  let nextStep = bimap (+ fst curr) (+ snd curr) (move d)
-   in case m !? nextStep of
+whereTo :: M -> D -> C -> Maybe (D, C)
+whereTo m d curr =
+  let step = nextStep d curr
+   in case m !? step of
         Nothing -> Nothing
-        Just O -> whereTo m (turn d, curr)
-        Just _ -> Just (d, nextStep)
+        Just Ob -> whereTo m (turn d) curr
+        Just _ -> Just (d, step)
 
-updateMap :: Chizu -> Coord -> (Chizu, Bool)
-updateMap m c = case m !? c of
-  Just V -> (m, False)
-  _ -> (insert c V m, True)
+visit :: M -> C -> Int -> (M, Int)
+visit m c v = case m !? c of
+  Just Vi -> (m, v)
+  _ -> (insert c Vi m, v + 1)
 
-doRounds :: Chizu -> (Dir, Coord) -> Int -> Int
-doRounds m a n =
-  let step = whereTo m a
+doRounds :: M -> D -> C -> Int -> Int
+doRounds m d c v =
+  let (m', v') = visit m c v
+      step = whereTo m d c
    in case step of
-        Nothing -> n
-        Just (newDir, next) ->
-          let (newMap, moved) = updateMap m next
-           in n + doRounds newMap (newDir, next) (fromEnum moved)
+        Nothing -> v'
+        Just (d', c') -> doRounds m' d' c' v'
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA input =
-  let curr = head $ findStartInList input
-      (chizu, _) = updateMap (mapFromNestedLists $ transpose input) curr
-   in doRounds chizu (U, curr) 1
+partA (s, m) = doRounds m Up s 1
 
 ----------- PART B -------------
 
