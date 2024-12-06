@@ -2,13 +2,19 @@ module AOC.Y2024.Day06 (runDay) where
 
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.List (transpose)
-import Data.Map.Strict (Map, insert, (!?))
+import Data.Map.Strict (Map, (!?), (!), insertWith)
+import qualified Data.Map.Strict as M (insert)
 import Data.String (IsString (..))
 import Data.Void
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
 import Util.Util (mapFromNestedLists)
+import Data.Set (Set, singleton, union)
+import qualified Data.Set as S (insert)
+import Data.Maybe (fromMaybe)
+import Control.Monad (guard)
+import Data.Tuple.Extra (both)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -49,7 +55,13 @@ type M = Map C Spot
 
 data D = Up | Do | Le | Ri deriving (Show)
 
+-- Axis of Vertical or Horizontal
+data A = V | H deriving (Eq, Ord)
 
+-- Line of Axis and respectively:
+-- | Horizontal -> the y value and the x value of last empty spot left<->right
+-- | Vertical -> the x value and the y value of last empty spot up<->down
+type L = Map (A, Int) (Set (Int, Int))
 
 ----------- PARSER -------------
 
@@ -76,34 +88,56 @@ turn Up = Ri
 turn Ri = Do
 turn Do = Le
 
-nextStep :: D -> C -> C
-nextStep d c = bimap (+ fst c) (+ snd c) (move d)
+nextStep :: C -> D -> C
+nextStep c d = bimap (+ fst c) (+ snd c) (move d)
 
-whereTo :: M -> D -> C -> Maybe (D, C)
-whereTo m d curr =
-  let step = nextStep d curr
+whereTo :: M -> C -> D -> Maybe (D, C)
+whereTo m c d =
+  let step = nextStep c d
    in case m !? step of
         Nothing -> Nothing
-        Just Ob -> whereTo m (turn d) curr
+        Just Ob -> whereTo m c (turn d)
         Just _ -> Just (d, step)
 
 visit :: M -> C -> Int -> (M, Int)
 visit m c v = case m !? c of
   Just Vi -> (m, v)
-  _ -> (insert c Vi m, v + 1)
+  _ -> (M.insert c Vi m, v + 1)
 
-doRounds :: M -> D -> C -> Int -> Int
-doRounds m d c v =
+findNextObstruction :: M -> C -> D -> C
+findNextObstruction m c d =
+  let c' = nextStep c d
+   in case m !? c' of
+        Nothing -> c
+        Just Ob -> c
+        _ -> findNextObstruction m c' d
+
+getAxis :: D -> A
+getAxis Le = H
+getAxis Ri = H
+getAxis Up = V
+getAxis Do = V
+
+onLine :: L -> C -> A -> Bool
+onLine ls (x, y) H = maybe False (any (\(x1, x2) -> x1 <= x && x2 >= x)) (ls !? (H, y))
+onLine ls (x, y) V = maybe False (any (\(x1, x2) -> x1 <= y && x2 >= y)) (ls !? (V, x))
+
+recordLine :: M -> C -> A -> L -> L
+recordLine m (x, y) H = insertWith union (H, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri)))
+recordLine m (x, y) V = insertWith union (V, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do)))
+
+doRounds :: M -> C -> D -> Int -> Int
+doRounds m c d v =
   let (m', v') = visit m c v
-      step = whereTo m d c
-   in case step of
+      dc' = whereTo m c d
+   in case dc' of
         Nothing -> v'
-        Just (d', c') -> doRounds m' d' c' v'
+        Just (d', c') -> doRounds m' c' d' v'
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (s, m) = doRounds m Up s 1
+partA (s, m) = doRounds m s Up 1
 
 ----------- PART B -------------
 
