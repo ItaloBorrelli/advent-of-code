@@ -2,8 +2,7 @@ module AOC.Y2024.Day06 (runDay) where
 
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.List (transpose)
-import Data.Map.Strict (Map, (!?), (!), insertWith)
-import qualified Data.Map.Strict as M (insert)
+import Data.Map.Strict (Map, (!?), empty,insert, insertWith)
 import Data.String (IsString (..))
 import Data.Void
 import Program.RunDay qualified as R (Day, runDay)
@@ -11,9 +10,6 @@ import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
 import Util.Util (mapFromNestedLists)
 import Data.Set (Set, singleton, union)
-import qualified Data.Set as S (insert)
-import Data.Maybe (fromMaybe)
-import Control.Monad (guard)
 import Data.Tuple.Extra (both)
 
 runDay :: R.Day
@@ -99,11 +95,6 @@ whereTo m c d =
         Just Ob -> whereTo m c (turn d)
         Just _ -> Just (d, step)
 
-visit :: M -> C -> Int -> (M, Int)
-visit m c v = case m !? c of
-  Just Vi -> (m, v)
-  _ -> (M.insert c Vi m, v + 1)
-
 findNextObstruction :: M -> C -> D -> C
 findNextObstruction m c d =
   let c' = nextStep c d
@@ -126,18 +117,23 @@ recordLine :: M -> C -> A -> L -> L
 recordLine m (x, y) H = insertWith union (H, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri)))
 recordLine m (x, y) V = insertWith union (V, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do)))
 
-doRounds :: M -> C -> D -> Int -> Int
-doRounds m c d v =
-  let (m', v') = visit m c v
+visit :: M -> L -> C -> (Int, Int) -> (M, L, Int, Int)
+visit m ls c (v, o) = case m !? c of
+  Just Vi -> (m, ls, v, o)
+  _ -> (insert c Vi m, ls, v + 1, o)
+
+doRounds :: M -> L -> C -> D -> (Int, Int) -> (Int, Int)
+doRounds m ls c d (v, o) =
+  let (m', ls', v', o') = visit m ls c (v, o)
       dc' = whereTo m c d
    in case dc' of
-        Nothing -> v'
-        Just (d', c') -> doRounds m' c' d' v'
+        Nothing -> (v', o')
+        Just (d', c') -> doRounds m' ls' c' d' (v', o')
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (s, m) = doRounds m s Up 1
+partA (s, m) = fst $ doRounds m (empty) s Up (1, 0)
 
 ----------- PART B -------------
 
