@@ -4,7 +4,6 @@ import Data.Bifunctor (Bifunctor (bimap))
 import Data.List (transpose)
 import Data.Map.Strict (Map, (!?), empty,insert, insertWith)
 import Data.String (IsString (..))
-import Data.Void
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
@@ -38,7 +37,7 @@ type Input = (C, M)
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 -- Coordinate
 type C = (Int, Int)
@@ -117,14 +116,14 @@ recordLine :: M -> C -> A -> L -> L
 recordLine m (x, y) H = insertWith union (H, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri)))
 recordLine m (x, y) V = insertWith union (V, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do)))
 
-visit :: M -> L -> C -> (Int, Int) -> (M, L, Int, Int)
-visit m ls c (v, o) = case m !? c of
+visit :: M -> L -> C -> D -> (Int, Int) -> (M, L, Int, Int)
+visit m ls c d (v, o) = case m !? c of
   Just Vi -> (m, ls, v, o)
-  _ -> (insert c Vi m, ls, v + 1, o)
+  _ -> (insert c Vi m, recordLine m c (getAxis d) ls, v + 1, o + fromEnum (onLine ls c (getAxis $ turn d)))
 
 doRounds :: M -> L -> C -> D -> (Int, Int) -> (Int, Int)
 doRounds m ls c d (v, o) =
-  let (m', ls', v', o') = visit m ls c (v, o)
+  let (m', ls', v', o') = visit m ls c d (v, o)
       dc' = whereTo m c d
    in case dc' of
         Nothing -> (v', o')
@@ -133,9 +132,9 @@ doRounds m ls c d (v, o) =
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (s, m) = fst $ doRounds m (empty) s Up (1, 0)
+partA (s, m) = fst $ doRounds m empty s Up (1, 0)
 
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB (s, m) = snd $ doRounds m empty s Up (1, 0)
