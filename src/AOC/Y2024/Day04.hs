@@ -1,7 +1,7 @@
 module AOC.Y2024.Day04 (runDay) where
 
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, many, newline, (<|>), endBy)
+import Text.Parsec (char, endBy, many, newline, (<|>))
 import Text.Parsec.Text (Parser)
 import Util.Util (both, safeTake, (!!?))
 
@@ -71,8 +71,11 @@ doIndexesGiveMAS = areValuesAtIndexes [M, A, S]
 
 checkMASInX :: [[XMAS]] -> Bool
 checkMASInX grid =
-  all (any (doIndexesGiveMAS grid . uncurry zip)) [[(zTo2, zTo2), (twoTo0, twoTo0)],
-     [(zTo2, twoTo0), (twoTo0, zTo2)]]
+  all
+    (any (doIndexesGiveMAS grid . uncurry zip))
+    [ [(zTo2, zTo2), (twoTo0, twoTo0)],
+      [(zTo2, twoTo0), (twoTo0, zTo2)]
+    ]
 
 partB :: Input -> OutputB
 partB = checkTopToBottom 3 (fromEnum . checkMASInX)
