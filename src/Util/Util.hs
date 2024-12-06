@@ -6,13 +6,14 @@ module Util.Util
     traceShowIdWithContext,
     (!!?),
     mapBoundingBox,
-    both,
     safeTake,
+    traceMap,
   )
 where
 
-import Data.Map.Strict (Map)
+import Data.Map.Strict (Map, findWithDefault, keys)
 import Data.Map.Strict qualified as Map
+import Data.String (IsString)
 import Debug.Trace (trace)
 
 {-
@@ -83,12 +84,25 @@ mapBoundingBox m =
     (minimum . fmap snd . Map.keys $ m)
     (maximum . fmap snd . Map.keys $ m)
 
--- Applies a function to both the first and second part of a tuple.
-both :: (a -> b) -> (a, a) -> (b, b)
-both f (x, y) = (f x, f y)
-
 -- Takes as many as it can, returning a list of the given number or the length of the list, whichever is lower.
 safeTake :: Int -> [a] -> [a]
 safeTake 0 _ = []
 safeTake _ [] = []
 safeTake n (x : xs) = x : safeTake (n - 1) xs
+
+-- Function to trace/display the Map
+traceMap :: (Show a, IsString a) => Map (Int, Int) a -> String
+traceMap m =
+  let allKeys = keys m
+      -- Extract rows and columns from the keys
+      rows = [fst k | k <- allKeys]
+      cols = [snd k | k <- allKeys]
+      minRow = minimum rows
+      maxRow = maximum rows
+      minCol = minimum cols
+      maxCol = maximum cols
+   in unlines [renderRow r minCol maxCol | r <- [minRow .. maxRow]]
+  where
+    -- Render a single row
+    renderRow row minCol maxCol =
+      unwords [show (findWithDefault "." (row, c) m) | c <- [minCol .. maxCol]]

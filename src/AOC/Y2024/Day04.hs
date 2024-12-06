@@ -1,10 +1,11 @@
 module AOC.Y2024.Day04 (runDay) where
 
+import Data.Tuple.Extra (both)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, many, newline, (<|>), eof)
-import Text.Parsec.Text (Parser)
-import Util.Util (both, safeTake, (!!?))
+import Text.Parsec (char, eof, many, newline, (<|>))
 import Text.Parsec.Combinator (sepBy)
+import Text.Parsec.Text (Parser)
+import Util.Util (safeTake, (!!?))
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB

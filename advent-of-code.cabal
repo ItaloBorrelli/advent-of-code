@@ -57,6 +57,7 @@ library
     , containers
     , data-aviary
     , directory
+    , extra >=1.8
     , mtl
     , optparse-applicative
     , parsec
@@ -82,6 +83,7 @@ executable advent-of-code-exe
     , containers
     , data-aviary
     , directory
+    , extra >=1.8
     , mtl
     , optparse-applicative
     , parsec
@@ -108,6 +110,7 @@ test-suite advent-of-code-test
     , containers
     , data-aviary
     , directory
+    , extra >=1.8
     , hspec >=2.7
     , mtl
     , optparse-applicative
