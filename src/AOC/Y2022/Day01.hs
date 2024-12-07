@@ -35,9 +35,9 @@ partA = maximum . map sum
 ----------- PART B -------------
 
 insertIfLarger :: (Ord a) => [a] -> a -> [a]
-insertIfLarger [] x= [x]
+insertIfLarger [] x = [x]
 insertIfLarger (y : ys) x
-  | x >= y = x : y : ys
+  | x >= y = x : ys
   | otherwise = y : insertIfLarger ys x
 
 insertTopThree :: (Ord a) => [a] -> a -> [a]
