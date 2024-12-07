@@ -1,10 +1,9 @@
 module AOC.Y2022.Day01 (runDay) where
 
-import Control.Applicative (optional)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (digit, endBy, eof, sepBy, try)
+import Text.Parsec (digit, eof)
 import Text.Parsec.Char (newline)
-import Text.Parsec.Combinator (endBy, many1, sepEndBy)
+import Text.Parsec.Combinator (many1, sepEndBy)
 import Text.Parsec.Text (Parser)
 
 runDay :: R.Day
