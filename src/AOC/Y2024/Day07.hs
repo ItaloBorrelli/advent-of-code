@@ -50,20 +50,20 @@ inputParser = parseLine `sepBy` newline <* eof
 
 operate :: T -> [O] -> V -> Int -> Bool
 operate t _ [] c = t == c
-operate t ops (x:xs) c = any (\op -> operate t ops xs (c `op` x)) ops
+operate t ops (x : xs) c = any (\op -> operate t ops xs (c `op` x)) ops
 
 runLine :: [O] -> L -> Int
-runLine ops (t,xs) = if operate t ops (tail xs) (head xs) then t else 0
+runLine ops (t, xs) = if operate t ops (tail xs) (head xs) then t else 0
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA = sum . map (runLine [(+),(*)])
+partA = sum . map (runLine [(+), (*)])
 
 ----------- PART B -------------
 
 (+-+) :: Int -> Int -> Int
-(+-+) a b = read (show a ++ show b)
+(+-+) a b = a * 10 ^ length (show b) + b
 
 partB :: Input -> OutputB
-partB = sum . map (runLine [(+),(*),(+-+)])
+partB = sum . map (runLine [(+), (*), (+-+)])
