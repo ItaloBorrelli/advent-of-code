@@ -2,11 +2,9 @@ module AOC.Y2024.Day06 (runDay) where
 
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.List (transpose)
-import Data.Map.Strict (Map, empty, insert, insertWith, (!?))
-import Data.Maybe (fromJust, isNothing)
+import Data.Map.Strict (Map, insertWith, (!), (!?))
 import Data.Set (Set, singleton, union)
 import Data.String (IsString (..))
-import Data.Tuple.Extra (both, third3)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
@@ -17,24 +15,7 @@ runDay = R.runDay inputParser partA partB
 
 ----------- TYPES --------------
 
--- Vi: Visited
--- Ob: Obstruction
--- Em: Empty
-data Spot = Vi | Ob | Em deriving (Eq)
-
-instance Show Spot where
-  show :: Spot -> String
-  show Ob = "#"
-  show Em = "."
-  show Vi = "X"
-
-instance IsString Spot where
-  fromString :: String -> Spot
-  fromString "#" = Ob
-  fromString "." = Em
-  fromString _ = Vi
-
-type Input = (C, M)
+type Input = (V, M)
 
 type OutputA = Int
 
@@ -46,30 +27,57 @@ type C = (Int, Int)
 -- Step
 type S = C
 
+-- Direction
+data D = Up | Do | Le | Ri deriving (Eq, Ord, Show)
+
+-- Vector
+type V = (C, D)
+
+-- Vi: Visited
+-- Ob: Obstruction
+-- Em: Empty
+data Spot = Vi (Set D) | Ob | Em | St deriving (Eq)
+
 -- Map of Coordinates to Spots
 type M = Map C Spot
 
-data D = Up | Do | Le | Ri deriving (Eq, Ord, Show)
+instance Show Spot where
+  show :: Spot -> String
+  show (Vi _) = "X"
+  show Ob = "#"
+  show Em = "."
+  show St = "X"
 
--- Axis of Vertical or Horizontal
-data A = V | H deriving (Eq, Ord)
-
--- Line of Axis and respectively:
-
--- | Horizontal -> the y value and the x value of last empty spot left<->right
--- | Vertical -> the x value and the y value of last empty spot up<->down
-type L = Map (D, Int) (Set (Int, Int))
+instance IsString Spot where
+  fromString "X" = Vi (singleton Up)
+  fromString "#" = Ob
+  fromString "." = Em
+  fromString _ = error "Invalid Spot string"
 
 ----------- PARSER -------------
 
 getStart :: [[Spot]] -> [(Int, Int)]
-getStart = concatMap (\(y, row) -> [(x, y) | (x, spot) <- zip [0 ..] row, spot == Vi]) . zip [0 ..]
+getStart = concatMap (\(y, row) -> [(x, y) | (x, spot) <- zip [0 ..] row, spot == St]) . zip [0 ..]
 
 parseLine :: Parser [Spot]
-parseLine = many ((Vi <$ char '^') <|> (Em <$ char '.') <|> (Ob <$ char '#'))
+parseLine = many ((St <$ char '^') <|> (Em <$ char '.') <|> (Ob <$ char '#'))
+
+combine :: Spot -> Spot -> Spot
+combine (Vi a) (Vi b) = Vi (a `union` b)
+combine (Vi a) _ = Vi a
+combine _ old = old
+
+vecsert :: V -> M -> M
+vecsert (c, d) = insertWith combine c (Vi $ singleton d)
+
+formInput :: [[Spot]] -> Input
+formInput g =
+  let (v, m) = ((head $ getStart g, Up), mapFromNestedLists $ transpose g)
+   in (v, vecsert v m)
 
 inputParser :: Parser Input
-inputParser = ((\g -> (head $ getStart g, mapFromNestedLists $ transpose g)) . filter (not . null) <$> (parseLine `sepBy` newline)) <* eof
+inputParser =
+  (formInput . filter (not . null) <$> (parseLine `sepBy` newline)) <* eof
 
 ----------- PART A&B -----------
 
@@ -85,86 +93,53 @@ turn Up = Ri
 turn Ri = Do
 turn Do = Le
 
-nextStep :: C -> D -> C
-nextStep c d = bimap (+ fst c) (+ snd c) (move d)
+nextStep :: V -> C
+nextStep (c, d) = bimap (+ fst c) (+ snd c) (move d)
 
-whereTo :: M -> C -> D -> Maybe (D, C)
-whereTo m c d =
-  let step = nextStep c d
-   in case m !? step of
-        Nothing -> Nothing
-        Just Ob -> Just (turn d, c)
-        Just _ -> Just (d, step)
-
-findNextObstruction :: M -> C -> D -> C
-findNextObstruction m c d =
-  let c' = nextStep c d
+whereTo :: V -> M -> Maybe V
+whereTo (c, d) m =
+  let c' = nextStep (c, d)
    in case m !? c' of
-        Nothing -> c
-        Just Ob -> c
-        _ -> findNextObstruction m c' d
+        Nothing -> Nothing
+        Just Ob -> Just (c, turn d)
+        Just _ -> Just (c', d)
 
-onLine :: L -> C -> D -> Bool
-onLine ls (x, y) d
-  | d == Le || d == Ri = maybe False (any (\(x1, x2) -> x1 <= x && x2 >= x)) (ls !? (d, y))
-  | otherwise = maybe False (any (\(y1, y2) -> y1 <= y && y2 >= y)) (ls !? (d, x))
+findNextObstruction :: V -> M -> Maybe C
+findNextObstruction (c, d) m =
+  let c' = nextStep (c, d)
+   in case m !? c' of
+        Nothing -> Nothing
+        Just Ob -> Just c
+        _ -> findNextObstruction (c', d) m
 
-recordLine :: M -> C -> D -> L -> L
-recordLine m (x, y) d ls
-  | d == Le || d == Ri = insertWith union (d, y) (singleton (both (fst . findNextObstruction m (x, y)) (Le, Ri))) ls
-  | otherwise = insertWith union (d, x) (singleton (both (snd . findNextObstruction m (x, y)) (Up, Do))) ls
+checkVec :: V -> M -> Bool
+checkVec (c, d) m = case m ! c of
+  Vi ds -> d `elem` ds
+  _ -> False
 
-visit :: M -> L -> C -> D -> (Int, Int) -> (M, L, Int, Int)
-visit m ls c d (v, o) =
-  let (ls', o') = (recordLine m c d ls, o + fromEnum (onLine ls c (turn d)))
-   in case m !? c of
-        Just Vi -> (m, ls', v, o')
-        _ -> (insert c Vi m, ls', v + 1, o')
+willLoop :: V -> M -> Bool
+willLoop (c, d) m =
+  case findNextObstruction (c, d) m of
+    Nothing -> False
+    Just c' -> checkVec (c', turn d) m || willLoop (c', turn d) (vecsert (c, d) m)
 
-doRounds :: M -> L -> C -> D -> (Int, Int) -> (Int, Int)
-doRounds m ls c d (v, o) =
-  let (m', ls', v', o') = visit m ls c d (v, o)
-      dc' = whereTo m c d
-   in case dc' of
-        Nothing -> (v', o')
-        Just (d', c') -> doRounds m' ls' c' d' (v', o')
-
-visit' :: M -> L -> C -> D -> (M, L, Bool)
-visit' m ls c d =
-  let ls' = recordLine m c d ls
-   in case m !? c of
-        Just Vi -> (m, ls', False)
-        _ -> (insert c Vi m, ls', True)
-
-fakeRun :: M -> L -> C -> D -> Maybe L
-fakeRun m ls c d =
-  let ls' = recordLine m c d ls
-      c' = findNextObstruction m c d
-      obstacle = m !? nextStep c' d
-   in if onLine ls c d
-        then Just ls'
-        else
-          if isNothing obstacle
-            then Nothing
-            else fakeRun m ls' c' (turn d)
-
-gallivant :: M -> L -> C -> D -> (Int, Int) -> (Int, Int)
-gallivant m ls c d (v, o) =
-  let (m', ls', v') = third3 ((+ v) . fromEnum) $ visit' m ls c d
-      dc' = whereTo m c d
-   in case dc' of
-        Nothing -> (v', o)
-        Just (d', c') ->
-          let runResult = fakeRun (insert (nextStep c' d') Ob m) ls c (turn d)
-              (ls'', o') = (if isNothing runResult then (ls', o) else (fromJust runResult, o + 1))
-           in gallivant m' ls'' c' d' (v', o')
+gallivant :: V -> M -> (Int, Int)
+gallivant (c, d) m =
+  let isNew = (\case Just (Vi _) -> 0; Nothing -> 0; _ -> 1) (m !? c)
+      v' = whereTo (c, d) m
+      m' = vecsert (c, d) m
+   in case v' of
+        Nothing -> (isNew, 0)
+        Just v'' ->
+          let loops = fromEnum $ willLoop (c, turn d) (vecsert v'' m)
+           in bimap (isNew +) (loops +) (gallivant v'' m')
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (s, m) = fst $ doRounds m empty s Up (1, 0)
+partA = (1 +) . fst . uncurry gallivant
 
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB (s, m) = snd $ gallivant m empty s Up (1, 0)
+partB = snd . uncurry gallivant
