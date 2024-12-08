@@ -17,6 +17,7 @@ import qualified AOC.Y2024.Day05 as Y2024Day05
 import qualified AOC.Y2024.Day06 as Y2024Day06
 import qualified AOC.Y2024.Day07 as Y2024Day07
 import qualified AOC.Y2024.Day08 as Y2024Day08
+import qualified AOC.Y2024.Day09 as Y2024Day09
 -- Other imports
 
 import qualified Control.Applicative.Combinators as C (option)
@@ -140,7 +141,8 @@ days =
       (202405, (Y2024Day05.runDay, "inputs/2024/05/input.txt")),
       (202406, (Y2024Day06.runDay, "inputs/2024/06/input.txt")),
       (202407, (Y2024Day07.runDay, "inputs/2024/07/input.txt")),
-      (202408, (Y2024Day08.runDay, "inputs/2024/08/input.txt"))
+      (202408, (Y2024Day08.runDay, "inputs/2024/08/input.txt")),
+      (202409, (Y2024Day09.runDay, "inputs/2024/09/input.txt"))
     ]
 {- ORMOLU_ENABLE -}
 
