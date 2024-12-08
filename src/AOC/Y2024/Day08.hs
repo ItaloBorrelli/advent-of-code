@@ -1,84 +1,94 @@
 module AOC.Y2024.Day08 (runDay) where
 
-import Data.Map.Strict (Map, empty, insertWith, keys, (!))
-import Data.Tuple.Extra (both)
-import Data.Void (Void)
+import Data.Map.Strict (Map, elems, empty, insertWith)
+import Data.Set (Set, fromList, union, unions)
+import Data.Set qualified as S
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec
-  ( anyChar,
-    char,
+  ( char,
     eof,
     many,
     newline,
+    satisfy,
     sepBy,
-    (<|>), satisfy,
+    (<|>),
   )
 import Text.Parsec.Text (Parser)
-import qualified Data.Set as S
-import Data.Set (Set, fromList, unions, union)
+import Util.Util (tupleUp)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
 ----------- TYPES --------------
 
-type N = Char
+-- Antenna
+type A = Char
 
-data Z = N Char | E deriving (Show)
+-- Value
+data V = N Char | E deriving (Show)
 
 -- Coordinate
 type C = (Int, Int)
 
-type M = Map N [C]
+-- Map of Antennas to Coordinates
+type M = Map A [C]
 
-type Input = [[Z]]
+type Input = (C, M)
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ----------- PARSER -------------
 
-parseLine :: Parser [Z]
+parseLine :: Parser [V]
 parseLine = many (E <$ char '.' <|> N <$> satisfy (/= '\n'))
 
 inputParser :: Parser Input
-inputParser = parseLine `sepBy` newline <* eof
+inputParser = (\i -> ((length i, length $ head i), mapInput empty (0, 0) i)) <$> (parseLine `sepBy` newline <* eof)
 
 ----------- PART A&B -----------
 
-mapRow :: M -> C -> [Z] -> M
+mapRow :: M -> C -> [V] -> M
 mapRow m _ [] = m
 mapRow m (x, y) (E : ps) = mapRow m (x, y + 1) ps
 mapRow m (x, y) (N p : ps) = insertWith (++) p [(x, y)] (mapRow m (x, y + 1) ps)
 
-mapInput :: M -> C -> [[Z]] -> M
+mapInput :: M -> C -> [[V]] -> M
 mapInput m _ [] = m
 mapInput m (x, y) (r : rs) = mapRow (mapInput m (x + 1, y) rs) (x, y) r
 
 inBounds :: (Int, Int) -> C -> Bool
-inBounds (w, h) (x, y) = x >= 0 && y >= 0 && x < w && y < h
+inBounds (w, h) (x, y) = all (>= 0) [x, y] && x < w && y < h
 
 numberOfAntinodes :: (Int, Int) -> C -> C -> Set C
 numberOfAntinodes wh (xa, ya) (xb, yb) =
   let (s, t) = (((xb - xa) + xb, (yb - ya) + yb), ((xa - xb) + xa, (ya - yb) + ya))
    in fromList $ map snd $ filter fst $ map (\r -> (inBounds wh r, r)) [s, t]
 
-checkList :: Set C -> (Int, Int) -> [C] -> Set C
-checkList s _ [] = s
-checkList s wh (x : xs) =
-    let s' = unions (map (numberOfAntinodes wh x) xs)
-    in checkList (s `union` s') wh xs
+checkList :: (Int, Int) -> [C] -> Set C
+checkList _ [] = S.empty
+checkList wh (x : xs) = checkList wh xs `union` unions (map (numberOfAntinodes wh x) xs)
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA input =
-  let m = mapInput empty (0, 0) input
-      wh = (length input, length $ head input)
-   in length $ foldl (\s k -> checkList s wh (m ! k)) (S.empty :: Set C) (keys m)
+partA (wh, m) = length $ foldl (\s v -> s `union` checkList wh v) (S.empty :: Set C) (elems m)
 
 ----------- PART B -------------
 
+fullCheck :: (Int, Int) -> (Int, Int) -> C -> Set C -> Set C
+fullCheck wh diffs c s =
+  let c' = tupleUp (+) diffs c
+      bounded = inBounds wh c'
+   in if bounded then S.insert c' (fullCheck wh diffs c' s) else s
+
+numberOfAntinodes' :: (Int, Int) -> C -> C -> Set C
+numberOfAntinodes' wh (xa, ya) (xb, yb) = fullCheck wh (xb - xa, yb - ya) (xb, yb) S.empty `union` fullCheck wh (xa - xb, ya - yb) (xa, ya) S.empty
+
+checkList' :: (Int, Int) -> [C] -> Set C
+checkList' _ [] = S.empty
+checkList' wh (x : xs) = checkList' wh xs `union` unions (map (numberOfAntinodes' wh x) xs)
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB (wh, m) = length $ foldl (\s v -> S.fromList v `union` s `union` checkList' wh v) (S.empty :: Set C) (elems m)
