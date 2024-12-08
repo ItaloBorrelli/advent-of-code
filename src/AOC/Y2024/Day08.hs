@@ -14,6 +14,8 @@ import Text.Parsec
     (<|>), satisfy,
   )
 import Text.Parsec.Text (Parser)
+import qualified Data.Set as S
+import Data.Set (Set, fromList, unions, union)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -57,14 +59,16 @@ mapInput m (x, y) (r : rs) = mapRow (mapInput m (x + 1, y) rs) (x, y) r
 inBounds :: (Int, Int) -> C -> Bool
 inBounds (w, h) (x, y) = x >= 0 && y >= 0 && x < w && y < h
 
-numberOfAntinodes :: (Int, Int) -> C -> C -> Int
+numberOfAntinodes :: (Int, Int) -> C -> C -> Set C
 numberOfAntinodes wh (xa, ya) (xb, yb) =
   let (s, t) = (((xb - xa) + xb, (yb - ya) + yb), ((xa - xb) + xa, (ya - yb) + ya))
-   in uncurry (+) $ both (fromEnum . inBounds wh) (s, t)
+   in fromList $ map snd $ filter fst $ map (\r -> (inBounds wh r, r)) [s, t]
 
-checkList :: (Int, Int) -> [C] -> Int
-checkList _ [] = 0
-checkList wh (x : xs) = checkList wh xs + sum (map (numberOfAntinodes wh x) xs)
+checkList :: Set C -> (Int, Int) -> [C] -> Set C
+checkList s _ [] = s
+checkList s wh (x : xs) =
+    let s' = unions (map (numberOfAntinodes wh x) xs)
+    in checkList (s `union` s') wh xs
 
 ----------- PART A -------------
 
@@ -72,7 +76,7 @@ partA :: Input -> OutputA
 partA input =
   let m = mapInput empty (0, 0) input
       wh = (length input, length $ head input)
-   in sum $ map (\k -> checkList wh (m ! k)) (keys m)
+   in length $ foldl (\s k -> checkList s wh (m ! k)) (S.empty :: Set C) (keys m)
 
 ----------- PART B -------------
 
