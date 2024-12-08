@@ -8,6 +8,8 @@ module Util.Util
     mapBoundingBox,
     safeTake,
     traceMap,
+    tupleToTuple,
+    tupleUp,
   )
 where
 
@@ -106,3 +108,9 @@ traceMap m =
     -- Render a single row
     renderRow row minCol maxCol =
       unwords [show (findWithDefault "." (row, c) m) | c <- [minCol .. maxCol]]
+
+tupleToTuple :: (a -> c, b -> d) -> (a, b) -> (c, d)
+tupleToTuple (f, g) (x, y) = (f x, g y)
+
+tupleUp :: (a -> b -> c) -> (a, a) -> (b, b) -> (c, c)
+tupleUp f (x1, x2) (y1, y2) = (f x1 y1, f x2 y2)
