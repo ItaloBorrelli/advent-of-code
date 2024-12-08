@@ -35,6 +35,7 @@ library
       AOC.Y2024.Day06
       AOC.Y2024.Day07
       AOC.Y2024.Day08
+      AOC.Y2024.Day09
       Program.Color
       Program.RunDay
       Util.Util
