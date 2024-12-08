@@ -10,6 +10,8 @@ module Util.Util
     traceMap,
     tupleToTuple,
     tupleUp,
+    twiceAsNice,
+    allFoldl,
   )
 where
 
@@ -114,3 +116,11 @@ tupleToTuple (f, g) (x, y) = (f x, g y)
 
 tupleUp :: (a -> b -> c) -> (a, a) -> (b, b) -> (c, c)
 tupleUp f (x1, x2) (y1, y2) = (f x1 y1, f x2 y2)
+
+-- Apply a binary function to two tuples and apply the binary function to the result
+twiceAsNice :: (a -> a -> a) -> (a, a) -> (a, a) -> a
+twiceAsNice f t1 t2 = f (uncurry f t1) (uncurry f t2)
+
+allFoldl :: (a -> b -> a -> b) -> b -> [a] -> b
+allFoldl _ y [] = y
+allFoldl f y (x : xs) = allFoldl f (foldl (f x) y xs) xs
