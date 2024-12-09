@@ -33,6 +33,7 @@ dependencies:
 - mtl
 - vector
 - data-aviary
+- ListZipper
 
 ghc-options:
 - -Wall

@@ -55,7 +55,8 @@ library
       GHC2021
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      ansi-terminal
+      ListZipper
+    , ansi-terminal
     , base >=4.7 && <5
     , containers
     , data-aviary
@@ -80,7 +81,8 @@ executable advent-of-code-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      advent-of-code
+      ListZipper
+    , advent-of-code
     , ansi-terminal
     , base >=4.7 && <5
     , containers
@@ -107,7 +109,8 @@ test-suite advent-of-code-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N4 -with-rtsopts=-qa -with-rtsopts=-C0 -funfolding-use-threshold=16 -fexcess-precision -optc-O3 -optc-ffast-math -O2
   build-depends:
-      advent-of-code
+      ListZipper
+    , advent-of-code
     , ansi-terminal
     , base >=4.7 && <5
     , containers
