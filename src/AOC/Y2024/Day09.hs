@@ -2,8 +2,7 @@ module AOC.Y2024.Day09 (runDay) where
 
 import Control.Applicative ((<|>))
 import Data.Char (digitToInt)
-import Data.List.Zipper (Zipper, cursor, fromList, fromListEnd, left, right, replace, start, delete, insert, toList, endp, beginp )
-import Data.Bifunctor (bimap)
+import Data.List.Zipper (Zipper, cursor, fromList, fromListEnd, left, right, replace, start, insert, endp, beginp )
 import Program.RunDay qualified as R
   ( Day,
     runDay,
