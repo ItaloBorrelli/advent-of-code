@@ -15,15 +15,12 @@ import Text.Parsec
     try,
   )
 import Text.Parsec.Text (Parser)
+import Data.Tuple.Extra (both)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
 
 ----------- TYPES --------------
-
-type BIn = (Int, Int)
-
-type B = (Int, (Int, Int))
 
 data Block = Block
   { i :: Int,
@@ -36,11 +33,11 @@ type Input = [Block]
 
 type OutputA = Int
 
-type OutputB = Input
+type OutputB = Int
 
 ----------- PARSER -------------
 
-readBlock :: Parser BIn
+readBlock :: Parser (Int, Int)
 readBlock = ((,) . digitToInt <$> digit) <*> (digitToInt <$> (try digit <|> pure '0'))
 
 block :: (Int, (Int, Int)) -> Block
@@ -51,10 +48,11 @@ inputParser = zipWith (curry block) [0 ..] <$> many readBlock <* eof
 
 ----------- PART A&B -----------
 
-blockSum :: Int -> Int -> Int -> Int
-blockSum fileId blockSize idx = sum $ map (fileId *) [idx .. (idx + blockSize - 1)]
+blockSum' :: Int -> Block -> Int
+blockSum' idx Block {i, size} = sum $ map (i *) [idx .. (idx + size - 1)]
 
--- (\x -> trace (show idx ++ "   id: " ++ show fileId ++ " size: " ++ show blockSize ++" total: "++ show x) x)
+moveRight :: Zipper Block -> (Block, Zipper Block)
+moveRight z = (cursor z, right z)
 
 ----------- PART A -------------
 
@@ -67,8 +65,6 @@ reduceEmpty Block {i, size, empty} decrease = Block i size (empty - decrease)
 reduceSize :: Block -> Int -> Block
 reduceSize Block {i, size, empty} decrease = Block i (size - decrease) empty
 
-moveRight :: Zipper Block -> (Block, Zipper Block)
-moveRight z = (cursor z, right z)
 
 moveLeft :: Zipper Block -> (Block, Zipper Block)
 moveLeft z = (cursor z, left z)
@@ -78,64 +74,57 @@ moveLeft z = (cursor z, left z)
 -- |
 -- | Parameters:
 -- | idx - The current index in the block list.
--- | (x, zx) - A tuple containing the current front block and the zipper for the front blocks.
--- | (y, zy) - A tuple containing the current back block and the zipper for the back blocks.
+-- | (x, xz) - A tuple containing the current front block and the zipper for the front blocks.
+-- | (y, yz) - A tuple containing the current back block and the zipper for the back blocks.
 zipChunks :: Int -> (Block, Zipper Block) -> (Block, Zipper Block) -> Int
-zipChunks idx (x, zx) (y, zy)
+zipChunks idx (x, xz) (y, yz)
   -- base case (zippers are at the same index): complete evaluation of x
-  | i x == i y = blockSum (i y) (size y) idx
+  | i x == i y = blockSum' idx y
   -- x not calculated: complete evaluation of x -> increment index -> re-evaluate new x & y
-  | size x /= 0 = blockSum (i x) (size x) idx + zipChunks (idx + size x) (sizeToZero x, zx) (y, zy)
-  -- no empty space at x: move right on zx
-  | empty x == 0 = zipChunks idx (moveRight zx) (y, zy)
-  -- no chunks left in y: move left on zy
-  | size y == 0 = zipChunks idx (x, zx) (moveLeft zy)
+  | size x /= 0 = blockSum' idx x + zipChunks (idx + size x) (sizeToZero x, xz) (y, yz)
+  -- no empty space at x: move right on xz
+  | empty x == 0 = zipChunks idx (moveRight xz) (y, yz)
+  -- no chunks left in y: move left on yz
+  | size y == 0 = zipChunks idx (x, xz) (moveLeft yz)
   -- space at x and chunks in y: evaluate what can be moved of y -> increment index -> reduce empty space in x -> reduce size of y -> re-evaluate new x & y
-  | otherwise = let available = min (empty x) (size y) in blockSum (i y) available idx + zipChunks (idx + available) (reduceEmpty x available, zx) (reduceSize y available, zy)
+  | otherwise = let available = min (empty x) (size y) in blockSum' idx (Block (i y) available 0) + zipChunks (idx + available) (reduceEmpty x available, xz) (reduceSize y available, yz)
 
 partA :: Input -> OutputA
 partA = (\(zf, zb) -> zipChunks 0 (cursor zf, right zf) (cursor zb, left zb)) . (\fs' -> (fromList fs', left $ fromListEnd fs'))
 
 ----------- PART B -------------
 
-q :: Int -> Int -> Int -> B -> Zipper B -> (Int, Int, B, Zipper B)
-q exitOn idx total (id1, (f1, e1)) zl
-  | exitOn == id1 = (idx, total, cursor $ left zl, left $ left zl)
-  | otherwise = q exitOn (idx + f1 + e1) (total + blockSum id1 f1 idx) (cursor zl) (right zl)
+emptyToZero :: Block -> Block
+emptyToZero Block {i, size} = Block i size 0
 
--- trace ("Case B: " ++ show (exitOn, id1, f1, idx)) $
-chkSum :: Int -> (B, B) -> (Zipper B, Zipper B) -> Int
-chkSum idx ((id1, (f1, e1)), (id2, (f2, e2))) (zl, zb)
-  | endp zl || endp zb = 0
-  | id1 == id2 && f1 + e1 == f2 + e2 = blockSum id2 f2 idx + chkSum (idx + f1 + e1) (cursor zl, cursor zb) (right zl, right zb)
-  | otherwise =
-      let (id2', (f2', e2')) = cursor zb
-          (idx', total, l', zl') = q id2' idx 0 (id1, (f1, e1)) zl
-       in total + chkSum idx' (l', (id2', (f2', e2'))) (zl', right zb)
+fullEmpty :: Block -> Block
+fullEmpty Block {i, size, empty} = Block i 0 (size + empty)
 
--- \| otherwise = trace "Case 2: " $ blockSum id1 f1 idx + chkSum (idx + f1 + e1) (cursor zl, (id2, (f2, e2))) (right zl, zb)
+moveToEmpty :: Int -> Block -> Block
+moveToEmpty emptyX Block {i, size} = Block i size (emptyX - size)
 
-zipBlocks' :: Zipper B -> Zipper B -> (Zipper B, Zipper B)
-zipBlocks' zf zb =
-  if beginp zb
-    then (start zf, start zb)
-    else
-      let (id1, (f1, e1)) = cursor zf
-          (id2, (f2, e2)) = cursor zb
-       in case () of
-            _
-              | id1 == id2 -> zipBlocks' (start zf) (left zb)
-              | f2 == 0 -> zipBlocks' zf (left zb)
-              | e1 == 0 -> zipBlocks' (right zf) zb
-              | f2 <= e1 ->
-                  let zf0 = (id1, (f1, 0))
-                      zf1 = (id2, (f2, e1 - f2))
-                      zb1 = (id2, (0, f2 + e2))
-                      zf' = insert zf0 $ replace zf1 zf
-                      zb' = left $ replace zb1 zb
-                   in zipBlocks' (start zf') zb'
-              | otherwise -> zipBlocks' (right zf) zb
+zipBlocks :: Zipper Block -> Zipper Block -> (Zipper Block, Zipper Block)
+zipBlocks xz yz
+  | beginp yz = (start xz, start yz)
+  | i x == i y = zipBlocks (start xz) (left yz)
+  | size y == 0 = zipBlocks xz (left yz)
+  | empty x == 0 = zipBlocks (right xz) yz
+  | size y <= empty x = zipBlocks (start $ insert (emptyToZero x) $ replace (moveToEmpty (empty x) y) xz) (left $ replace (fullEmpty y) yz)
+  | otherwise = zipBlocks (right xz) yz
+  where (x, y) = both cursor (xz, yz)
+
+
+blockSize :: Block -> Int
+blockSize Block {size, empty} = size + empty
+
+checkSum :: Int -> (Block, Zipper Block) -> (Block, Zipper Block) -> [Int] -> Int
+checkSum idx (x, xz) (y, yz) counted
+  -- at end of xz (base case)
+  | endp xz = 0
+  | i x `elem` counted = checkSum (idx + blockSize x) (moveRight xz) (y, yz) counted
+  | i x /= i y = blockSum' idx x + checkSum (idx + blockSize x) (moveRight xz) (y, yz) (i x:counted)
+  | blockSize x == blockSize y = blockSum' idx y + checkSum (idx + blockSize y) (moveRight xz) (moveRight yz) counted
+  | otherwise = checkSum idx (x, xz) (moveRight yz) counted
 
 partB :: Input -> OutputB
--- partB fs = (\(zf, zb) -> trace (show $ toList zf) $ trace (show $ toList zb) $ chkSum 0 (cursor zf, cursor zb) (right zf, right zb)) $ (\fs' -> zipBlocks' (fromList fs') (left $ fromListEnd fs')) $ zip [0 ..] fs
-partB fs = fs
+partB = (\(xz, yz) -> checkSum 0 (cursor xz, right xz) (cursor yz, right yz) []) . (\fs' -> zipBlocks (fromList fs') (left $ fromListEnd fs'))
