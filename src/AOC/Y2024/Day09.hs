@@ -3,6 +3,7 @@ module AOC.Y2024.Day09 (runDay) where
 import Control.Applicative ((<|>))
 import Data.Char (digitToInt)
 import Data.List.Zipper (Zipper, beginp, cursor, endp, fromList, fromListEnd, insert, left, replace, right, start, toList)
+import Data.Tuple.Extra (both)
 import Debug.Trace (trace)
 import Program.RunDay qualified as R
   ( Day,
@@ -15,7 +16,6 @@ import Text.Parsec
     try,
   )
 import Text.Parsec.Text (Parser)
-import Data.Tuple.Extra (both)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -65,7 +65,6 @@ reduceEmpty Block {i, size, empty} decrease = Block i size (empty - decrease)
 reduceSize :: Block -> Int -> Block
 reduceSize Block {i, size, empty} decrease = Block i (size - decrease) empty
 
-
 moveLeft :: Zipper Block -> (Block, Zipper Block)
 moveLeft z = (cursor z, left z)
 
@@ -111,8 +110,8 @@ zipBlocks xz yz
   | empty x == 0 = zipBlocks (right xz) yz
   | size y <= empty x = zipBlocks (start $ insert (emptyToZero x) $ replace (moveToEmpty (empty x) y) xz) (left $ replace (fullEmpty y) yz)
   | otherwise = zipBlocks (right xz) yz
-  where (x, y) = both cursor (xz, yz)
-
+  where
+    (x, y) = both cursor (xz, yz)
 
 blockSize :: Block -> Int
 blockSize Block {size, empty} = size + empty
@@ -122,7 +121,7 @@ checkSum idx (x, xz) (y, yz) counted
   -- at end of xz (base case)
   | endp xz = 0
   | i x `elem` counted = checkSum (idx + blockSize x) (moveRight xz) (y, yz) counted
-  | i x /= i y = blockSum' idx x + checkSum (idx + blockSize x) (moveRight xz) (y, yz) (i x:counted)
+  | i x /= i y = blockSum' idx x + checkSum (idx + blockSize x) (moveRight xz) (y, yz) (i x : counted)
   | blockSize x == blockSize y = blockSum' idx y + checkSum (idx + blockSize y) (moveRight xz) (moveRight yz) counted
   | otherwise = checkSum idx (x, xz) (moveRight yz) counted
 
