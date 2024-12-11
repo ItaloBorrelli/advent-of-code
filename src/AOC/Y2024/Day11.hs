@@ -35,19 +35,25 @@ blink1 s
        in [firstHalf, secondHalf]
   | otherwise = [s * 2024]
 
+update :: (Int, Int) -> (ValueMap, Int) -> (ValueMap, Int)
+update k (m, c) = (insert k c m, c)
+
 blinkN :: Int -> ValueMap -> Int -> (ValueMap, Int)
 blinkN n m s = case m !? (s, n) of
   Nothing
-    | n == 1 -> (\c -> (insert (s, 1) c m, c)) $ length $ blink1 s
-    | otherwise -> (\(m'', c'') -> (insert (s, n) c'' m'', c'')) $ foldl (\(m', c') s' -> second (c' +) $ blinkN (n - 1) m' s') (m, 0) (blink1 s)
+    | n == 1 -> update (s, 1) (m, length $ blink1 s)
+    | otherwise -> update (s, n) $ blinkAll (n - 1) m (blink1 s)
   Just c -> (m, c)
+
+blinkAll :: Int -> ValueMap -> [Int] -> (ValueMap, Int)
+blinkAll n m = foldl (\(m', c) -> second (c +) . blinkN n m') (m, 0)
 
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA ss = snd $ foldl (\(m, c) s -> let (m', c') = blinkN 25 m s in (m', c + c')) (empty, 0) ss
+partA = snd . blinkAll 25 empty 
 
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB ss = snd $ foldl (\(m, c) s -> let (m', c') = blinkN 75 m s in (m', c + c')) (empty, 0) ss
+partB = snd . blinkAll 75 empty 
