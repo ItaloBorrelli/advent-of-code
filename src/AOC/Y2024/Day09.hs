@@ -2,9 +2,8 @@ module AOC.Y2024.Day09 (runDay) where
 
 import Control.Applicative ((<|>))
 import Data.Char (digitToInt)
-import Data.List.Zipper (Zipper, beginp, cursor, endp, fromList, fromListEnd, insert, left, replace, right, start, toList)
+import Data.List.Zipper (Zipper, beginp, cursor, endp, fromList, fromListEnd, insert, left, replace, right, start)
 import Data.Tuple.Extra (both)
-import Debug.Trace (trace)
 import Program.RunDay qualified as R
   ( Day,
     runDay,
