@@ -41,7 +41,7 @@ update k (m, c) = (insert k c m, c)
 blinkN :: Int -> ValueMap -> Int -> (ValueMap, Int)
 blinkN n m s = case m !? (s, n) of
   Nothing
-    | n == 1 -> update (s, 1) (m, length $ blink1 s)
+    | n == 1 -> update (s, 1) (m, if even (length (show s)) then 2 else 1)
     | otherwise -> update (s, n) $ blinkAll (n - 1) m (blink1 s)
   Just c -> (m, c)
 
@@ -51,9 +51,9 @@ blinkAll n m = foldl (\(m', c) -> second (c +) . blinkN n m') (m, 0)
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA = snd . blinkAll 25 empty 
+partA = snd . blinkAll 25 empty
 
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB = snd . blinkAll 75 empty 
+partB = snd . blinkAll 75 empty
