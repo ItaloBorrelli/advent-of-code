@@ -1,0 +1,119 @@
+#!/bin/bash
+
+if [[ -f .env ]]; then
+    source .env
+fi
+
+year=$YEAR
+day=$DAY
+ALL_DAYS=false
+INIT=false
+RUN=false
+TEST=false
+INPUT_FILE=""
+TIMINGS=false
+
+get_all_flags() {
+    while getopts "atiy:d:-:" opt; do
+        case $opt in
+            a) ALL_DAYS=true;;
+            t) TEST=true;;
+            i) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+            r) RUN=true;;
+            y) year="$OPTARG";;
+            d) day="$OPTARG";;
+            -)
+                case "${OPTARG}" in
+                    all-days) ALL_DAYS=true;;
+                    init) INIT=true;;
+                    run) RUN=true;;
+                    timings) TIMINGS=true;;
+                    test) TEST=true;;
+                    input) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    year)
+                        year="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    day)
+                        day="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    *) echo "Unknown flag: -${OPTARG}";;
+                esac;;
+            *) echo "Unknown flag: -${opt}";;
+        esac
+    done
+}
+
+validate_date() {
+    RESULT=0
+
+    if [[ ! -z $year && ! $year =~ ^[0-9]{4}$ ]]; then
+        echo "Invalid year: $year"
+        echo "Must be four digits long"
+        RESULT=1
+    fi
+
+    if [[ ! -z $day ]] && [[ ! $day =~ ^[0-9]{2}$ ]]; then
+        echo "Invalid day: $day"
+        echo "Must be two digits long"
+        RESULT=1
+    fi
+
+    if [[ RESULT == 1 ]]; then
+        exit 1
+    fi
+
+    return $RESULT
+}
+
+use_today_if_no_date() {
+    if [[ -z $YEAR ]]; then
+        export YEAR=${YEAR:-$(date +%Y)}
+    fi
+
+    if [[ -z $DAY ]]; then
+        export DAY=${DAY:-$(date +%d)}
+    fi
+}
+
+get_all_flags "$@"
+
+if [ "$TEST" = true ]; then
+    if [ "$ALL_DAYS" = false ]; then
+        validate_date "$year" "$day"
+        if [[ $? -ne 0 ]]; then
+            exit 1
+        fi
+        use_today_if_no_date
+        stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/" --progress-bar=none 
+    else
+        stack run -- --all-days
+    fi
+    exit 0
+fi
+
+if [ "$RUN" = true ]; then
+    if [ "$ALL_DAYS" = false ]; then
+        validate_date "$year" "$day"
+        if [[ $? -ne 0 ]]; then
+            exit 1
+        fi
+        use_today_if_no_date
+        if [ -z "$INPUT_FILE" ]; then
+            stack run -- -d ${YEAR}${DAY}
+        else
+            stack run -- -d ${YEAR}${DAY} -i "$INPUT_FILE"
+        fi
+    else
+        stack run -- --all-days
+    fi
+    exit 0
+fi
+
+if [ "$INIT" = true ]; then
+    validate_date "$year" "$day"
+    if [[ $? -ne 0 ]]; then
+        exit 1
+    fi
+    export YEAR=$year
+    export DAY=$day
+    use_today_if_no_date
+    ./scripts/init_day.sh
+fi
