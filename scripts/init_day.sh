@@ -1,7 +1,5 @@
 #!/bin/bash
 
-eval "$(./scripts/resolve_date.sh "$@")"
-
 echo "Year: $YEAR"
 echo "Day: $DAY"
 
