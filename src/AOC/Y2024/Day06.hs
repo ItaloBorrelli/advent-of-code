@@ -6,12 +6,12 @@ module AOC.Y2024.Day06 (runDay) where
 import Data.Bifunctor (Bifunctor (first, second))
 import Data.List (transpose)
 import Data.Map.Lazy (Map, empty, insert, insertWith, member, (!?))
+import Data.Maybe (fromMaybe)
 import Data.Set (Set, singleton, union)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many1, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
 import Util.Util (mapFromNestedLists)
-import Data.Maybe (fromMaybe)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -92,13 +92,14 @@ isNew c = not . member c
 visit :: G -> V -> Int
 visit (c, _) v = fromEnum (isNew c v)
 
-patrol' :: G -> V -> M -> Int
-patrol' g v m = visit g v + case moveOrTurn m g of
-  Nothing -> 0
-  Just g' -> patrol' g' (vecsert g v) m
+patrol :: G -> V -> M -> Int
+patrol g v m =
+  visit g v + case moveOrTurn m g of
+    Nothing -> 0
+    Just g' -> patrol g' (vecsert g v) m
 
 partA :: Input -> OutputA
-partA (g, m) = patrol' g empty m
+partA (g, m) = patrol g empty m
 
 ----------- PART B -------------
 
@@ -110,13 +111,13 @@ loopCheck g v m = case moveOrTurn m g of
   Nothing -> False
   Just g' -> isRepeat g' v || loopCheck g' (vecsert g v) m
 
-tryLoop :: G -> G -> V -> M -> Int
-tryLoop g (c', _) v m = fromEnum (isNew c' v && loopCheck g v (insert c' O m))
+tryLoop :: G -> C -> V -> M -> Int
+tryLoop g o v m = fromEnum (isNew o v && loopCheck g v (insert o O m))
 
 gallivant :: G -> V -> M -> Int
 gallivant g v m = case moveOrTurn m g of
   Nothing -> 0
-  Just g' -> tryLoop g g' v m + gallivant g' (vecsert g v) m
+  Just g' -> tryLoop g (fst g') v m + gallivant g' (vecsert g v) m
 
 partB :: Input -> OutputB
 partB (g, m) = gallivant g empty m
