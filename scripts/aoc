@@ -11,32 +11,46 @@ INIT=false
 RUN=false
 TEST=false
 INPUT_FILE=""
-TIMINGS=false
+
+show_help() {
+    echo "Usage: aoc [-h] "
+    echo "Options:"
+    echo "  -a, --all-days       Run or test all days"
+    echo "  -t, --test           Run tests"
+    echo "  -g, --init           Initialize a new day"
+    echo "  -i, --input FILE     Specify input file"
+    echo "  -r, --run            Run the solution"
+    echo "  -y, --year YEAR      Specify the year (four digits)"
+    echo "  -d, --day DAY        Specify the day (two digits)"
+    echo "  -h, --help           Show this help message"
+}
 
 get_all_flags() {
-    while getopts "atiy:d:-:" opt; do
+    while getopts "atgiry:d:h-:" opt; do
         case $opt in
             a) ALL_DAYS=true;;
             t) TEST=true;;
+            g) INIT=true;;
             i) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
             r) RUN=true;;
             y) year="$OPTARG";;
             d) day="$OPTARG";;
+            h) show_help; exit 0;;
             -)
                 case "${OPTARG}" in
                     all-days) ALL_DAYS=true;;
                     init) INIT=true;;
                     run) RUN=true;;
-                    timings) TIMINGS=true;;
                     test) TEST=true;;
                     input) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
                     year)
                         year="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
                     day)
                         day="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    help) show_help; exit 0;;
                     *) echo "Unknown flag: -${OPTARG}";;
                 esac;;
-            *) echo "Unknown flag: -${opt}";;
+            *) show_help; exit 1;;
         esac
     done
 }
@@ -75,6 +89,12 @@ use_today_if_no_date() {
 
 get_all_flags "$@"
 
+if ([ "$RUN" = true ] && [ "$TEST" = true ]) || ([ "$RUN" = true ] && [ "$INIT" = true ]) || ([ "$TEST" = true ] && [ "$INIT" = true ]); then
+    echo "Error: Options --run|-r, --test|-t, and --init|-g cannot be used together."
+    show_help
+    exit 1
+fi
+
 if [ "$TEST" = true ]; then
     if [ "$ALL_DAYS" = false ]; then
         validate_date "$year" "$day"
@@ -97,12 +117,12 @@ if [ "$RUN" = true ]; then
         fi
         use_today_if_no_date
         if [ -z "$INPUT_FILE" ]; then
-            stack run -- -d ${YEAR}${DAY}
+            stack run -- -d ${YEAR}${DAY} --timings
         else
-            stack run -- -d ${YEAR}${DAY} -i "$INPUT_FILE"
+            stack run -- -d ${YEAR}${DAY} -i "$INPUT_FILE" --timings
         fi
     else
-        stack run -- --all-days
+        stack run -- --all-days --timings
     fi
     exit 0
 fi
