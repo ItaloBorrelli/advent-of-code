@@ -1,16 +1,13 @@
 module AOC.Y2024.Day12 (runDay) where
 
-import Data.Void ( Void )
 import qualified Program.RunDay   as R (Day, runDay)
 import Text.Parsec ( newline, sepBy, eof, many )
 import Text.Parsec.Text ( Parser )
 import Text.Parsec.Char (noneOf)
-import Data.Map.Strict (Map, (!?), (!), insertWith, foldlWithKey, empty, insert, mapAccumWithKey, keys)
+import Data.Map.Strict (Map, (!?), (!), insert, keys)
 import Data.Bifunctor (Bifunctor(second, first))
 import Util.Util (mapFromNestedLists)
-import qualified Data.Map.Strict as M (foldl)
 import Debug.Trace (trace)
-import Control.Applicative (Alternative((<|>)))
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
