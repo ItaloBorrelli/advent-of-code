@@ -6,7 +6,6 @@
 
 module Main (main) where
 
-import Util.Days (days)
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
 import Data.List (intercalate)
@@ -46,6 +45,7 @@ import Program.RunDay
     )
 import System.Console.ANSI (Color (..))
 import Text.Printf (printf)
+import Util.Days (days)
 
 data Days
     = AllDays
