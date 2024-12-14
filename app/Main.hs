@@ -11,7 +11,6 @@ import Control.Monad (forM_, unless)
 import Data.List (intercalate)
 import Data.Map
     ( Map
-    , fromList
     , mapKeys
     , mapWithKey
     , toList
@@ -40,8 +39,7 @@ import Options.Applicative
 -- Data Output
 import Program.Color (withColor)
 import Program.RunDay
-    ( Day
-    , Verbosity (Quiet, Timings, Verbose)
+    ( Verbosity (Quiet, Timings, Verbose)
     )
 import System.Console.ANSI (Color (..))
 import Text.Printf (printf)
