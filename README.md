@@ -14,6 +14,8 @@ export PATH="$HOME/advent-of-code/scripts:$PATH"
 
 It is also suggested to set at least `export YEAR=2024` in a `.env` file, like in the `.env.example`. You can also add a day as in `export DAY=01`.
 
+Additionally, because this was setup with VS Code in mind you can also set `export PROMPT_VSCODE=true` in the `.env`. This will then prompt to run `code` with the input files and solution code file in VS Code immediately.
+
 ### GHCup & Stack
 
 This was created with `GHCup` and `stack` was installed through `GHCup`. Using `cabal` for this project, or not using `GHCup` is left as an exercise for the reader. To install follow [the official instructions](https://www.haskell.org/ghcup/install/).
