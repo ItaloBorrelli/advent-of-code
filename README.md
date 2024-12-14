@@ -68,11 +68,15 @@ Then run `aoc -t` or `aoc --test`. The days code will be run with the input of `
 
 This runs `stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/"`.
 
+Adding the `-a` or `--all-days` flag runs specs on every day.
+
 ### Run day
 
 Put your puzzle input into `input.txt` and run the day with `aoc -r` or `aoc --run`. You can also provide a different input file with the `-i ${INPUT_FILE}` or `--input ${INPUT_FILE}`.
 
 This runs `stack run -- -d ${YEAR}${DAY} --timings` or `stack run -- -d ${YEAR}${DAY} -i ${INPUT_FILE} --timings` depending on whether an input file was provided.
+
+Adding the `-a` or `--all-days` flag runs every day.
 
 ## Other
 
