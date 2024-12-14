@@ -22,6 +22,7 @@ import qualified AOC.Y2024.Day10 as Y2024Day10
 import qualified AOC.Y2024.Day11 as Y2024Day11
 import qualified AOC.Y2024.Day12 as Y2024Day12
 import qualified AOC.Y2024.Day13 as Y2024Day13
+
 -- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
