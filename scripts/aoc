@@ -79,7 +79,7 @@ validate_date() {
 
 use_today_if_no_date() {
     if [[ -z $YEAR ]]; then
-        export YEAR=${YEAR:-$(TZ=America/New_York date +%d)}
+        export YEAR=${YEAR:-$(TZ=America/New_York date +%Y)}
     fi
 
     if [[ -z $DAY ]]; then
@@ -142,7 +142,7 @@ init() {
     echo "Are you satisfied with the above values?"
     echo "Note: Content will not be deleted if files already exist"
     echo
-    read -p "Continue (y/n): " confirm
+    read -p "Continue? (y/n) " confirm
     if [[ $confirm != [yY] ]]; then
         echo "Change the .env file to provide export the desired YEAR and DAY OR provide both/either value in the command line input."
         echo "Otherwise todays day and year will be used."
@@ -221,6 +221,14 @@ init() {
     fi
 
     echo
+
+    if [[ $PROMPT_VSCODE == true ]]; then
+        read -p "Open up files in VS Code immediately? (y/n) " confirm
+        if [[ $confirm == [yY] ]]; then
+            code "$TEST_ANSWER_FILE" "$TEST_INPUT_FILE" "$INPUT_FILE" "$SOLUTION_FILE"
+            echo
+        fi
+    fi
 
     echo "Done! Good luck!"
 
