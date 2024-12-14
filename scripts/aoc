@@ -79,11 +79,11 @@ validate_date() {
 
 use_today_if_no_date() {
     if [[ -z $YEAR ]]; then
-        export YEAR=${YEAR:-$(date +%Y)}
+        export YEAR=${YEAR:-$(TZ=America/New_York date +%d)}
     fi
 
     if [[ -z $DAY ]]; then
-        export DAY=${DAY:-$(date +%d)}
+        export DAY=${DAY:-$(TZ=America/New_York date +%d)}
     fi
 }
 
