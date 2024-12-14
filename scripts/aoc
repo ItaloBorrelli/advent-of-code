@@ -89,6 +89,13 @@ use_today_if_no_date() {
 
 get_all_flags "$@"
 
+if [ ! -f app/Main.hs -o ! -f test/Spec.hs ]; then
+    echo
+    echo "Error: app/Main.hs or test/Spec.hs not found. Are you sure you're in the right directory?"
+    echo
+    exit 1
+fi
+
 if ([ "$RUN" = true ] && [ "$TEST" = true ]) || ([ "$RUN" = true ] && [ "$INIT" = true ]) || ([ "$TEST" = true ] && [ "$INIT" = true ]); then
     echo "Error: Options --run|-r, --test|-t, and --init|-g cannot be used together."
     show_help
@@ -127,6 +134,99 @@ if [ "$RUN" = true ]; then
     exit 0
 fi
 
+init() {
+    echo "Year: $YEAR"
+    echo "Day: $DAY"
+    echo
+    echo "This will initialize the folder and file structure for the given day."
+    echo "Are you satisfied with the above values?"
+    echo "Note: Content will not be deleted if files already exist"
+    echo
+    read -p "Continue (y/n): " confirm
+    if [[ $confirm != [yY] ]]; then
+        echo "Change the .env file to provide export the desired YEAR and DAY OR provide both/either value in the command line input."
+        echo "Otherwise todays day and year will be used."
+        exit 1
+    fi
+
+    echo
+
+    INPUT_DIR="inputs/$YEAR/$DAY"
+
+    mkdir -p $INPUT_DIR
+
+    INPUT_FILE_NAME="input.txt"
+    INPUT_FILE="$INPUT_DIR/$INPUT_FILE_NAME"
+    if [ ! -f $INPUT_FILE ]; then
+        touch $INPUT_FILE
+        echo "Created '$INPUT_FILE_NAME' in '$INPUT_DIR'"
+    fi
+
+    TEST_ANSWER_FILE_NAME="test-answers.txt"
+    TEST_ANSWER_FILE="$INPUT_DIR/$TEST_ANSWER_FILE_NAME"
+    if [ ! -f $TEST_ANSWER_FILE ]; then
+        touch $TEST_ANSWER_FILE
+        echo "Couldn't run Part A!" >> $TEST_ANSWER_FILE
+        echo "Couldn't run Part B!" >> $TEST_ANSWER_FILE
+        echo "Created '$TEST_ANSWER_FILE_NAME' in '$INPUT_DIR'"
+    fi
+
+    TEST_INPUT_FILE_NAME="test-input.txt"
+    TEST_INPUT_FILE="$INPUT_DIR/$TEST_INPUT_FILE_NAME"
+    if [ ! -f $TEST_INPUT_FILE ]; then
+        touch $TEST_INPUT_FILE
+        echo "Created '$TEST_INPUT_FILE_NAME' in '$INPUT_DIR'"
+    fi
+
+    SOLVE_DIR="src/AOC/Y$YEAR"
+    SOLVE_FILE_NAME="Day$DAY.hs"
+    SOLUTION_FILE="$SOLVE_DIR/$SOLVE_FILE_NAME"
+    if [ ! -f $SOLUTION_FILE ]; then
+        mkdir -p $SOLVE_DIR
+        cp ./Day.hs.template $SOLUTION_FILE
+        sed -i "s/YYYYY\.DayXX/Y$YEAR.Day$DAY/g" $SOLUTION_FILE
+        echo "Created '$SOLVE_FILE_NAME' in '$SOLVE_DIR'"
+    else
+        echo "Existing file '$SOLVE_FILE_NAME' in '$SOLVE_DIR'"
+    fi
+
+    MAIN_FILE="app/Main.hs"
+    IMPORT_STATEMENT="import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
+    IMPORT_PREFIX=${IMPORT_STATEMENT:0:32}
+    if ! grep -q "$IMPORT_PREFIX" "$MAIN_FILE"; then
+        sed -i "/-- Day imports/ { :a; n; /^import /! { s/.*/$IMPORT_STATEMENT\n&/; b }; ba }" "$MAIN_FILE"
+        echo "Import statement added to '$MAIN_FILE'"
+    else
+        echo "Existing import in '$MAIN_FILE'"
+    fi
+
+    INSERT_STATEMENT="(${YEAR}${DAY}, (Y${YEAR}Day${DAY}.runDay, \"inputs/${YEAR}/${DAY}/input.txt\"))"
+    if ! grep -q "$INSERT_STATEMENT" "$MAIN_FILE"; then
+        sed -i -E "s/(input.txt\"\)\))$/\1,/g" "$MAIN_FILE"
+        sed -i "/-- Insert new days here/,/]/ { 
+            /^[[:space:]]*]/ i \      $INSERT_STATEMENT
+        }" "$MAIN_FILE"
+        echo "runDay added to '$MAIN_FILE'"
+    else
+        echo "Existing day entry in  '$MAIN_FILE'"
+    fi
+
+    SPEC_FILE="test/Spec.hs"
+    TEST_STATEMENT="it \"${YEAR}${DAY}\" $ do runDay (\"${YEAR}\", \"${DAY}\")"
+    if ! grep -q "$TEST_STATEMENT" "$SPEC_FILE"; then
+        sed -i "/-- Add new tests here/ a \    $TEST_STATEMENT" "$SPEC_FILE"
+        echo "Test entry added to '$SPEC_FILE'"
+    else
+        echo "Existing test entry in '$SPEC_FILE'"
+    fi
+
+    echo
+
+    echo "Done! Good luck!"
+
+    echo
+}
+
 if [ "$INIT" = true ]; then
     validate_date "$year" "$day"
     if [[ $? -ne 0 ]]; then
@@ -135,5 +235,6 @@ if [ "$INIT" = true ]; then
     export YEAR=$year
     export DAY=$day
     use_today_if_no_date
-    ./scripts/init_day.sh
+    init
 fi
+
