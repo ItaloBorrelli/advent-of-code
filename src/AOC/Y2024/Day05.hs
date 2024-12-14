@@ -52,9 +52,9 @@ middle xs = xs !! (length xs `div` 2)
 
 pageOrder :: RulesMap -> Int -> Int -> Ordering
 pageOrder m a b =
-  fromMaybe EQ $
-    ((guard . (b `elem`)) =<< m !? a) $> LT
-      <|> ((guard . (a `elem`)) =<< m !? b) $> GT
+    fromMaybe EQ $
+        ((guard . (b `elem`)) =<< m !? a) $> LT
+            <|> ((guard . (a `elem`)) =<< m !? b) $> GT
 
 sortPage :: RulesMap -> Page -> Page
 sortPage = sortBy . pageOrder

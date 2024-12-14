@@ -1,18 +1,18 @@
 module AOC.Y2024.Day07 (runDay) where
 
 import Program.RunDay qualified as R
-  ( Day,
-    runDay,
-  )
+    ( Day
+    , runDay
+    )
 import Text.Parsec
-  ( char,
-    digit,
-    eof,
-    many1,
-    newline,
-    sepBy,
-    space,
-  )
+    ( char
+    , digit
+    , eof
+    , many1
+    , newline
+    , sepBy
+    , space
+    )
 import Text.Parsec.Text (Parser)
 
 runDay :: R.Day

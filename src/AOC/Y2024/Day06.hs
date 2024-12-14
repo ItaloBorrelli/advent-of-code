@@ -57,9 +57,9 @@ toMap = mapFromNestedLists . transpose . map (map (\s -> case s of Start spot ->
 
 inputParser :: Parser Input
 inputParser =
-  (\x -> (start x, toMap x))
-    <$> many1 (Caret <$ char '^' <|> Start O <$ char '#' <|> Start N <$ char '.') `sepBy` newline
-    <* eof
+    (\x -> (start x, toMap x))
+        <$> many1 (Caret <$ char '^' <|> Start O <$ char '#' <|> Start N <$ char '.') `sepBy` newline
+        <* eof
 
 ----------- PART A&B -----------
 
@@ -77,9 +77,9 @@ move (c, R) = first (1 +) c
 
 moveOrTurn :: M -> G -> Maybe G
 moveOrTurn m g = case m !? move g of
-  Nothing -> Nothing
-  Just O -> Just (second turn g)
-  Just N -> Just (move g, snd g)
+    Nothing -> Nothing
+    Just O -> Just (second turn g)
+    Just N -> Just (move g, snd g)
 
 vecsert :: G -> V -> V
 vecsert (c, d) = insertWith union c (singleton d)
@@ -94,9 +94,9 @@ visit (c, _) v = fromEnum (isNew c v)
 
 patrol :: G -> V -> M -> Int
 patrol g v m =
-  visit g v + case moveOrTurn m g of
-    Nothing -> 0
-    Just g' -> patrol g' (vecsert g v) m
+    visit g v + case moveOrTurn m g of
+        Nothing -> 0
+        Just g' -> patrol g' (vecsert g v) m
 
 partA :: Input -> OutputA
 partA (g, m) = patrol g empty m
@@ -108,16 +108,16 @@ isRepeat (c, d) v = fromMaybe False (v !? c >>= \ds -> Just (d `elem` ds))
 
 loopCheck :: G -> V -> M -> Bool
 loopCheck g v m = case moveOrTurn m g of
-  Nothing -> False
-  Just g' -> isRepeat g' v || loopCheck g' (vecsert g v) m
+    Nothing -> False
+    Just g' -> isRepeat g' v || loopCheck g' (vecsert g v) m
 
 tryLoop :: G -> C -> V -> M -> Int
 tryLoop g o v m = fromEnum (isNew o v && loopCheck g v (insert o O m))
 
 gallivant :: G -> V -> M -> Int
 gallivant g v m = case moveOrTurn m g of
-  Nothing -> 0
-  Just g' -> tryLoop g (fst g') v m + gallivant g' (vecsert g v) m
+    Nothing -> 0
+    Just g' -> tryLoop g (fst g') v m + gallivant g' (vecsert g v) m
 
 partB :: Input -> OutputB
 partB (g, m) = gallivant g empty m

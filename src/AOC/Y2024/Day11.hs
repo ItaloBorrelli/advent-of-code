@@ -30,20 +30,22 @@ inputParser = (read <$> many digit) `sepBy` char ' ' <* eof
 blink1 :: Int -> [Int]
 blink1 0 = [1]
 blink1 s
-  | even (length (show s)) =
-      let (firstHalf, secondHalf) = both read $ splitAt (length (show s) `div` 2) (show s)
-       in [firstHalf, secondHalf]
-  | otherwise = [s * 2024]
+    | even (length (show s)) =
+        let
+            (firstHalf, secondHalf) = both read $ splitAt (length (show s) `div` 2) (show s)
+         in
+            [firstHalf, secondHalf]
+    | otherwise = [s * 2024]
 
 update :: (Int, Int) -> (ValueMap, Int) -> (ValueMap, Int)
 update k (m, c) = (insert k c m, c)
 
 blinkN :: Int -> ValueMap -> Int -> (ValueMap, Int)
 blinkN n m s = case m !? (s, n) of
-  Nothing
-    | n == 1 -> update (s, 1) (m, if even (length (show s)) then 2 else 1)
-    | otherwise -> update (s, n) $ blinkAll (n - 1) m (blink1 s)
-  Just c -> (m, c)
+    Nothing
+        | n == 1 -> update (s, 1) (m, if even (length (show s)) then 2 else 1)
+        | otherwise -> update (s, n) $ blinkAll (n - 1) m (blink1 s)
+    Just c -> (m, c)
 
 blinkAll :: Int -> ValueMap -> [Int] -> (ValueMap, Int)
 blinkAll n m = foldl (\(m', c) -> second (c +) . blinkN n m') (m, 0)

@@ -1,18 +1,18 @@
 module Util.Util
-  ( freq,
-    mapFromNestedLists,
-    chunksOf,
-    chunksByPredicate,
-    traceShowIdWithContext,
-    (!!?),
-    mapBoundingBox,
-    safeTake,
-    traceMap,
-    tupleToTuple,
-    tupleUp,
-    twiceAsNice,
-    allFoldl,
-  )
+    ( freq
+    , mapFromNestedLists
+    , chunksOf
+    , chunksByPredicate
+    , traceShowIdWithContext
+    , (!!?)
+    , mapBoundingBox
+    , safeTake
+    , traceMap
+    , tupleToTuple
+    , tupleUp
+    , twiceAsNice
+    , allFoldl
+    )
 where
 
 import Data.Map.Strict (Map, findWithDefault, keys)
@@ -99,19 +99,21 @@ safeTake n (x : xs) = x : safeTake (n - 1) xs
 -- Function to trace/display the Map
 traceMap :: (Show a, IsString a) => Map (Int, Int) a -> String
 traceMap m =
-  let allKeys = keys m
-      -- Extract rows and columns from the keys
-      rows = [fst k | k <- allKeys]
-      cols = [snd k | k <- allKeys]
-      minRow = minimum rows
-      maxRow = maximum rows
-      minCol = minimum cols
-      maxCol = maximum cols
-   in unlines [renderRow r minCol maxCol | r <- [minRow .. maxRow]]
+    let
+        allKeys = keys m
+        -- Extract rows and columns from the keys
+        rows = [fst k | k <- allKeys]
+        cols = [snd k | k <- allKeys]
+        minRow = minimum rows
+        maxRow = maximum rows
+        minCol = minimum cols
+        maxCol = maximum cols
+     in
+        unlines [renderRow r minCol maxCol | r <- [minRow .. maxRow]]
   where
     -- Render a single row
     renderRow row minCol maxCol =
-      unwords [show (findWithDefault "." (row, c) m) | c <- [minCol .. maxCol]]
+        unwords [show (findWithDefault "." (row, c) m) | c <- [minCol .. maxCol]]
 
 tupleToTuple :: (a -> c, b -> d) -> (a, b) -> (c, d)
 tupleToTuple (f, g) (x, y) = (f x, g y)

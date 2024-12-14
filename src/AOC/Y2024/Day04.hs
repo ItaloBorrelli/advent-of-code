@@ -33,8 +33,8 @@ inputParser = filter (not . null) <$> parseLine `sepBy` newline <* eof
 checkLeftToRight :: ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkLeftToRight _ [] = 0
 checkLeftToRight evaluate grid
-  | all null grid = 0
-  | otherwise = evaluate grid + checkLeftToRight evaluate (map tail grid)
+    | all null grid = 0
+    | otherwise = evaluate grid + checkLeftToRight evaluate (map tail grid)
 
 checkTopToBottom :: Int -> ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkTopToBottom _ _ [] = 0
@@ -73,11 +73,11 @@ doIndexesGiveMAS = areValuesAtIndexes [M, A, S]
 
 checkMASInX :: [[XMAS]] -> Bool
 checkMASInX grid =
-  all
-    (any (doIndexesGiveMAS grid . uncurry zip))
-    [ [(zTo2, zTo2), (twoTo0, twoTo0)],
-      [(zTo2, twoTo0), (twoTo0, zTo2)]
-    ]
+    all
+        (any (doIndexesGiveMAS grid . uncurry zip))
+        [ [(zTo2, zTo2), (twoTo0, twoTo0)]
+        , [(zTo2, twoTo0), (twoTo0, zTo2)]
+        ]
 
 partB :: Input -> OutputB
 partB = checkTopToBottom 3 (fromEnum . checkMASInX)

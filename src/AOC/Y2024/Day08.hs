@@ -7,14 +7,14 @@ import Data.Set qualified as S
 import Data.Tuple.Extra (both)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec
-  ( char,
-    eof,
-    many,
-    newline,
-    satisfy,
-    sepBy,
-    (<|>),
-  )
+    ( char
+    , eof
+    , many
+    , newline
+    , satisfy
+    , sepBy
+    , (<|>)
+    )
 import Text.Parsec.Text (Parser)
 import Util.Util (allFoldl, tupleUp, twiceAsNice)
 
@@ -73,9 +73,11 @@ inBounds wh xy = twiceAsNice (&&) (both (>= 0) xy) (tupleUp (<) xy wh)
 
 check1 :: B -> (Int, Int) -> C -> Set C -> Set C
 check1 wh diffs c s =
-  let c' = tupleUp (+) diffs c
-      bounded = inBounds wh c'
-   in if bounded then S.insert c' s else s
+    let
+        c' = tupleUp (+) diffs c
+        bounded = inBounds wh c'
+     in
+        if bounded then S.insert c' s else s
 
 numberOfAntinodes :: B -> C -> Set C -> C -> Set C
 numberOfAntinodes wh c1 s c2 = checkWith check1 wh c2 c1 $ checkWith check1 wh c1 c2 s
@@ -90,9 +92,11 @@ partA (wh, m) = length $ foldl (checkList wh) (S.empty :: Set C) (elems m)
 
 fullCheck :: B -> (Int, Int) -> C -> Set C -> Set C
 fullCheck wh diffs c s =
-  let c' = tupleUp (+) diffs c
-      bounded = inBounds wh c'
-   in if bounded then S.insert c' (fullCheck wh diffs c' s) else s
+    let
+        c' = tupleUp (+) diffs c
+        bounded = inBounds wh c'
+     in
+        if bounded then S.insert c' (fullCheck wh diffs c' s) else s
 
 numberOfAntinodes' :: B -> C -> Set C -> C -> Set C
 numberOfAntinodes' wh c1 s c2 = checkWith fullCheck wh c2 c1 $ checkWith fullCheck wh c1 c2 s

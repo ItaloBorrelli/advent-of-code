@@ -2,15 +2,15 @@ module AOC.Y2024.Day03 (runDay) where
 
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec
-  ( anyChar,
-    char,
-    digit,
-    many,
-    many1,
-    string,
-    try,
-    (<|>),
-  )
+    ( anyChar
+    , char
+    , digit
+    , many
+    , many1
+    , string
+    , try
+    , (<|>)
+    )
 import Text.Parsec.Text (Parser)
 
 runDay :: R.Day
@@ -30,19 +30,19 @@ data Commands = Mul (Int, Int) | Junk Char | Enable | Disable deriving (Show)
 
 parseMul :: Parser (Int, Int)
 parseMul =
-  string "mul("
-    *> ( ((,) . read <$> many1 digit) <*> (char ',' *> (read <$> many1 digit))
-       )
-    <* char ')'
+    string "mul("
+        *> ( ((,) . read <$> many1 digit) <*> (char ',' *> (read <$> many1 digit))
+           )
+        <* char ')'
 
 inputParser :: Parser Input
 inputParser =
-  many
-    ( Mul <$> try parseMul
-        <|> (Enable <$ try (string "do()"))
-        <|> (Disable <$ try (string "don't()"))
-        <|> (Junk <$> anyChar)
-    )
+    many
+        ( Mul <$> try parseMul
+            <|> (Enable <$ try (string "do()"))
+            <|> (Disable <$ try (string "don't()"))
+            <|> (Junk <$> anyChar)
+        )
 
 ----------- PART A&B -----------
 

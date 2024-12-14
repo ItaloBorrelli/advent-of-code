@@ -35,8 +35,8 @@ splitSum = foldr f []
 insertIfLarger :: (Ord a) => a -> [a] -> [a]
 insertIfLarger x [] = [x]
 insertIfLarger x (y : ys)
-  | x >= y = x : y : ys
-  | otherwise = y : insertIfLarger x ys
+    | x >= y = x : y : ys
+    | otherwise = y : insertIfLarger x ys
 
 ----------- PART A -------------
 

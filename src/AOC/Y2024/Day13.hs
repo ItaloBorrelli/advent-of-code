@@ -46,11 +46,13 @@ inputParser = parseE `sepBy` skipMany1 newline <* eof
 
 solve :: E -> Int
 solve ((x1, y1), (x2, y2), (x, y)) =
-  let d = (x1 * y2 - x2 * y1)
-      ad = (y2 * x - x2 * y)
-      bd = (x1 * y - y1 * x)
-      m = (ad `mod` d) + (bd `mod` d)
-   in if m /= 0 then 0 else (3 * ad `div` d) + bd `div` d
+    let
+        d = (x1 * y2 - x2 * y1)
+        ad = (y2 * x - x2 * y)
+        bd = (x1 * y - y1 * x)
+        m = (ad `mod` d) + (bd `mod` d)
+     in
+        if m /= 0 then 0 else (3 * ad `div` d) + bd `div` d
 
 ----------- PART A -------------
 
