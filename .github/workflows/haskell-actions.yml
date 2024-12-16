@@ -44,7 +44,7 @@ jobs:
     needs: stack-build
 
     steps:
-      - name: Run Ormolu
+      - name: Run Fourmolu
         uses: haskell-actions/run-fourmolu@v9
         with:
           pattern:

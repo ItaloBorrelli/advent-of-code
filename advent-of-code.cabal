@@ -27,6 +27,7 @@ library
   exposed-modules:
       Program.Color
       Program.RunDay
+      Util.Days
       Util.Util
   other-modules:
       Paths_advent_of_code
