@@ -1,6 +1,7 @@
 module Util.Util
     ( freq
     , mapFromNestedLists
+    , mapFromNestedLists'
     , chunksOf
     , chunksByPredicate
     , traceShowIdWithContext
@@ -15,9 +16,8 @@ module Util.Util
     )
 where
 
-import Data.Map.Strict (Map, findWithDefault, keys)
+import Data.Map.Strict (Map, (!?), keys)
 import Data.Map.Strict qualified as Map
-import Data.String (IsString)
 import Debug.Trace (trace)
 
 {-
@@ -40,6 +40,13 @@ mapFromNestedLists = Map.fromList . attachCoords 0 0
     attachCoords _ _ [] = []
     attachCoords x _ ([] : ls) = attachCoords (x + 1) 0 ls
     attachCoords x y ((l : ls) : lss) = ((x, y), l) : attachCoords x (y + 1) (ls : lss)
+
+mapFromNestedLists' :: [[a]] -> Map (Int, Int) a
+mapFromNestedLists' = Map.fromList . attachCoords 0 0
+  where
+    attachCoords _ _ [] = []
+    attachCoords x _ ([] : ls) = attachCoords (x + 1) 0 ls
+    attachCoords x y ((l : ls) : lss) = ((y, x), l) : attachCoords x (y + 1) (ls : lss)
 
 -- Splits a list into chunks of the specified size.
 -- The final chunk may be smaller than the chunk size.
@@ -97,7 +104,7 @@ safeTake _ [] = []
 safeTake n (x : xs) = x : safeTake (n - 1) xs
 
 -- Function to trace/display the Map
-traceMap :: (Show a, IsString a) => Map (Int, Int) a -> String
+traceMap :: (Show a) => Map (Int, Int) a -> String
 traceMap m =
     let
         allKeys = keys m
@@ -109,11 +116,11 @@ traceMap m =
         minCol = minimum cols
         maxCol = maximum cols
      in
-        unlines [renderRow r minCol maxCol | r <- [minRow .. maxRow]]
+        unlines [renderRow c minRow maxRow | c <- [minCol .. maxCol]]
   where
     -- Render a single row
-    renderRow row minCol maxCol =
-        unwords [show (findWithDefault "." (row, c) m) | c <- [minCol .. maxCol]]
+    renderRow col minRow maxRow =
+        unwords [show (findWithDefault "." (r, col) m) | r <- [minRow .. maxRow]]
 
 tupleToTuple :: (a -> c, b -> d) -> (a, b) -> (c, d)
 tupleToTuple (f, g) (x, y) = (f x, g y)
