@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+
 {-# HLINT ignore "Use empty" #-}
 module Util.Days
     ( days
@@ -23,7 +24,6 @@ import AOC.Y2024.Day12 qualified as Y2024Day12
 import AOC.Y2024.Day13 qualified as Y2024Day13
 import AOC.Y2024.Day14 qualified as Y2024Day14
 import AOC.Y2024.Day15 qualified as Y2024Day15
-
 import Data.Map
     ( Map
     , fromList

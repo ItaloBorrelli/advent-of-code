@@ -26,7 +26,7 @@ parseLine :: Parser [XMAS]
 parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S'))
 
 inputParser :: Parser Input
-inputParser = filter (not . null) <$> parseLine `sepBy` newline <* eof
+inputParser = parseLine `sepBy` newline
 
 ----------- PART A&B -----------
 
