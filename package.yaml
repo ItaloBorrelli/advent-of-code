@@ -21,6 +21,7 @@ description:         Please see the README on GitHub at <https://github.com/Ital
 
 dependencies:
 - base >= 4.7 && < 5
+- extra >= 1.8
 - time
 - ansi-terminal
 - directory
@@ -32,6 +33,7 @@ dependencies:
 - mtl
 - vector
 - data-aviary
+- ListZipper
 
 ghc-options:
 - -Wall

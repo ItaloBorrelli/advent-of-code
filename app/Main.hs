@@ -6,75 +6,52 @@
 
 module Main (main) where
 
--- Day imports
-import qualified AOC.Y2022.Day01 as Y2022Day01
-import qualified AOC.Y2022.Day02 as Y2022Day02
-import qualified AOC.Y2022.Day03 as Y2022Day03
-import qualified AOC.Y2022.Day04 as Y2022Day04
-import qualified AOC.Y2022.Day05 as Y2022Day05
-import qualified AOC.Y2022.Day06 as Y2022Day06
-import qualified AOC.Y2022.Day07 as Y2022Day07
-import qualified AOC.Y2022.Day08 as Y2022Day08
-import qualified AOC.Y2022.Day09 as Y2022Day09
-import qualified AOC.Y2022.Day10 as Y2022Day10
-import qualified AOC.Y2022.Day11 as Y2022Day11
-import qualified AOC.Y2022.Day12 as Y2022Day12
-import qualified AOC.Y2022.Day13 as Y2022Day13
-import qualified AOC.Y2022.Day14 as Y2022Day14
-import qualified AOC.Y2022.Day15 as Y2022Day15
-import qualified AOC.Y2022.Day16 as Y2022Day16
-import qualified AOC.Y2024.Day01 as Y2024Day01
-import qualified AOC.Y2024.Day02 as Y2024Day02
-import qualified AOC.Y2024.Day03 as Y2024Day03
-import qualified AOC.Y2024.Day04 as Y2024Day04
--- Other imports
 import qualified Control.Applicative.Combinators as C (option)
 import Control.Monad (forM_, unless)
 import Data.List (intercalate)
 import Data.Map
-  ( Map,
-    fromList,
-    mapKeys,
-    mapWithKey,
-    toList,
-    (!?),
-  )
+    ( Map
+    , mapKeys
+    , mapWithKey
+    , toList
+    , (!?)
+    )
 import Data.Maybe (fromMaybe)
 import Options.Applicative
-  ( Alternative ((<|>)),
-    Parser,
-    auto,
-    execParser,
-    flag',
-    fullDesc,
-    help,
-    helper,
-    info,
-    long,
-    metavar,
-    option,
-    optional,
-    progDesc,
-    short,
-    strOption,
-    (<**>),
-  )
+    ( Alternative ((<|>))
+    , Parser
+    , auto
+    , execParser
+    , flag'
+    , fullDesc
+    , help
+    , helper
+    , info
+    , long
+    , metavar
+    , option
+    , optional
+    , progDesc
+    , short
+    , strOption
+    , (<**>)
+    )
 -- Data Output
 import Program.Color (withColor)
 import Program.RunDay
-  ( Day,
-    Verbosity (Quiet, Timings, Verbose),
-  )
+    ( Verbosity (Quiet, Timings, Verbose)
+    )
 import System.Console.ANSI (Color (..))
 import Text.Printf (printf)
+import Util.Days (days)
 
 data Days
-  = AllDays
-  | OneDay
-      { day :: Int,
-        input :: Maybe String
-      }
-  deriving (Show)
+    = AllDays
+    | OneDay
+        { day :: Int
+        , input :: Maybe String
+        }
+    deriving (Show)
 
 data Options = Options Days Verbosity
 
@@ -82,135 +59,113 @@ dayParser :: Parser Days
 dayParser = (OneDay <$> day <*> input) <|> allDays
   where
     day =
-      option auto $
-        long "day"
-          <> short 'd'
-          <> metavar "DAY"
-          <> help "Present the solutions for one day."
+        option auto $
+            long "day"
+                <> short 'd'
+                <> metavar "DAY"
+                <> help "Present the solutions for one day."
 
     input =
-      optional $
-        strOption $
-          long "input"
-            <> short 'i'
-            <> metavar "FILE"
-            <> help "The file to read the selected day's input from."
+        optional $
+            strOption $
+                long "input"
+                    <> short 'i'
+                    <> metavar "FILE"
+                    <> help "The file to read the selected day's input from."
 
     allDays =
-      flag' AllDays $
-        long "all-days"
-          <> help
-            ( unwords
-                [ "Present solutions for all of the days of",
-                  "Advent of Code, with default input file names."
-                ]
-            )
+        flag' AllDays $
+            long "all-days"
+                <> help
+                    ( unwords
+                        [ "Present solutions for all of the days of"
+                        , "Advent of Code, with default input file names."
+                        ]
+                    )
 
 optionsParser :: Parser Options
 optionsParser = Options <$> dayParser <*> verbosityParser
   where
     verbosityParser :: Parser Verbosity
     verbosityParser =
-      C.option Quiet $
-        flag'
-          Verbose
-          ( long "verbose"
-              <> short 'v'
-              <> help
-                ( unwords
-                    [ "Whether to print out extra info, such as the",
-                      "result of the input parser, and more detailed",
-                      "error messages.",
-                      "Also enables timing of solutions."
-                    ]
+        C.option Quiet $
+            flag'
+                Verbose
+                ( long "verbose"
+                    <> short 'v'
+                    <> help
+                        ( unwords
+                            [ "Whether to print out extra info, such as the"
+                            , "result of the input parser, and more detailed"
+                            , "error messages."
+                            , "Also enables timing of solutions."
+                            ]
+                        )
                 )
-          )
-          <|> flag'
-            Timings
-            ( long "timings"
-                <> short 't'
-                <> help
-                  ( unwords
-                      ["Whether to enable timing of the solutions."]
-                  )
-            )
-
-{- ORMOLU_DISABLE -}
-days :: Map Int (Day, String)
-days =
-  fromList $ (202201, (Y2022Day01.runDay, "inputs/2022/01/input.txt")):
-     -- Insert new days here
-      (202202, (Y2022Day02.runDay, "inputs/2022/02/input.txt")):
-      (202203, (Y2022Day03.runDay, "inputs/2022/03/input.txt")):
-      (202204, (Y2022Day04.runDay, "inputs/2022/04/input.txt")):
-      (202205, (Y2022Day05.runDay, "inputs/2022/05/input.txt")):
-      (202206, (Y2022Day06.runDay, "inputs/2022/06/input.txt")):
-      (202207, (Y2022Day07.runDay, "inputs/2022/07/input.txt")):
-      (202208, (Y2022Day08.runDay, "inputs/2022/08/input.txt")):
-      (202209, (Y2022Day09.runDay, "inputs/2022/09/input.txt")):
-      (202210, (Y2022Day10.runDay, "inputs/2022/10/input.txt")):
-      (202211, (Y2022Day11.runDay, "inputs/2022/11/input.txt")):
-      (202212, (Y2022Day12.runDay, "inputs/2022/12/input.txt")):
-      (202213, (Y2022Day13.runDay, "inputs/2022/13/input.txt")):
-      (202214, (Y2022Day14.runDay, "inputs/2022/14/input.txt")):
-      (202215, (Y2022Day15.runDay, "inputs/2022/15/input.txt")):
-      (202216, (Y2022Day16.runDay, "inputs/2022/16/input.txt")):
-      (202401, (Y2024Day01.runDay, "inputs/2024/01/input.txt")):
-      (202402, (Y2024Day02.runDay, "inputs/2024/02/input.txt")):
-      (202403, (Y2024Day03.runDay, "inputs/2024/03/input.txt")):
-      (202404, (Y2024Day04.runDay, "inputs/2024/04/input.txt")):[]
-{- ORMOLU_ENABLE -}
+                <|> flag'
+                    Timings
+                    ( long "timings"
+                        <> short 't'
+                        <> help
+                            ( unwords
+                                ["Whether to enable timing of the solutions."]
+                            )
+                    )
 
 formatDay :: Int -> String
 formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)
 
 performDay :: Options -> IO ()
 performDay (Options d v) = case d of
-  AllDays -> do
-    results <-
-      let eachDay day (dayFunc, inputFile) = do
-            withColor Magenta $ putStrLn $ formatDay day
-            dayFunc v inputFile
-       in sequence $ mapWithKey eachDay days
+    AllDays -> do
+        results <-
+            let
+                eachDay day (dayFunc, inputFile) = do
+                    withColor Magenta $ putStrLn $ formatDay day
+                    dayFunc v inputFile
+             in
+                sequence $ mapWithKey eachDay days
 
-    printSummary results
-  OneDay {..} -> case days !? day of
-    Nothing -> putStrLn "Invalid day provided."
-    Just (dayFunc, inputFile) -> do
-      let i' = fromMaybe inputFile input
-      withColor Magenta $ putStrLn $ formatDay day
-      _ <- dayFunc v i'
-      withColor Magenta $ putStrLn "************"
+        printSummary results
+    OneDay {..} -> case days !? day of
+        Nothing -> putStrLn "Invalid day provided."
+        Just (dayFunc, inputFile) -> do
+            let
+                i' = fromMaybe inputFile input
+            withColor Magenta $ putStrLn $ formatDay day
+            _ <- dayFunc v i'
+            withColor Magenta $ putStrLn "************"
 
 printSummary :: Map Int (Maybe Double, Maybe Double) -> IO ()
 printSummary results = do
-  putStrLn "\n************\n  Summary:  "
-  let partsA = mapKeys ((++ " (a)") . printf "%02d") $ fmap fst results
-      partsB = mapKeys ((++ " (b)") . printf "%02d") $ fmap snd results
-      parts = toList $ partsA <> partsB
+    putStrLn "\n************\n  Summary:  "
+    let
+        partsA = mapKeys ((++ " (a)") . printf "%02d") $ fmap fst results
+        partsB = mapKeys ((++ " (b)") . printf "%02d") $ fmap snd results
+        parts = toList $ partsA <> partsB
 
-      fails = [p | (p, Nothing) <- parts]
-      fasts = [(p, t) | (p, Just t) <- parts, t < 1]
-      slows = [(p, t) | (p, Just t) <- parts, t >= 1]
+        fails = [p | (p, Nothing) <- parts]
+        fasts = [(p, t) | (p, Just t) <- parts, t < 1]
+        slows = [(p, t) | (p, Just t) <- parts, t >= 1]
 
-  putStr $ printf "\n%d parts " $ length fasts
-  withColor Green $ putStr "completed in under 1 second"
-  putStrLn ".\nOf the remainder:"
-  unless (null fails) $ do
-    putStr $ printf "  %d parts" $ length fails
-    withColor Red $ putStr " failed"
-    putStrLn $ ":\n    " ++ intercalate ", " fails
-  unless (null slows) $ do
-    putStr $ printf "  %d parts" $ length slows
-    withColor Yellow $ putStr " took over 1 second to complete"
-    putStrLn ":"
-    forM_ slows $
-      \(p, t) -> putStrLn $ printf "    %s took %.2f seconds" p t
+    putStr $ printf "\n%d parts " $ length fasts
+    withColor Green $ putStr "completed in under 1 second"
+    putStrLn ".\nOf the remainder:"
+    unless (null fails) $ do
+        putStr $ printf "  %d parts" $ length fails
+        withColor Red $ putStr " failed"
+        putStrLn $ ":\n    " ++ intercalate ", " fails
+    unless (null slows) $ do
+        putStr $ printf "  %d parts" $ length slows
+        withColor Yellow $ putStr " took over 1 second to complete"
+        putStrLn ":"
+        forM_ slows $
+            \(p, t) -> putStrLn $ printf "    %s took %.2f seconds" p t
 
 main :: IO ()
 main = performDay =<< execParser opts
   where
     opts =
-      info
-        (optionsParser <**> helper)
-        (fullDesc <> progDesc "Prints out some Advent of Code solutions.")
+        info
+            (optionsParser <**> helper)
+            (fullDesc <> progDesc "Prints out some Advent of Code solutions.")

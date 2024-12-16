@@ -1,9 +1,11 @@
 module AOC.Y2024.Day04 (runDay) where
 
+import Data.Tuple.Extra (both)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, endBy, many, newline, (<|>))
+import Text.Parsec (char, eof, many, newline, (<|>))
+import Text.Parsec.Combinator (sepBy)
 import Text.Parsec.Text (Parser)
-import Util.Util (both, safeTake, (!!?))
+import Util.Util (safeTake, (!!?))
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -24,15 +26,15 @@ parseLine :: Parser [XMAS]
 parseLine = many ((X <$ char 'X') <|> (M <$ char 'M') <|> (A <$ char 'A') <|> (S <$ char 'S'))
 
 inputParser :: Parser Input
-inputParser = parseLine `endBy` newline
+inputParser = parseLine `sepBy` newline
 
 ----------- PART A&B -----------
 
 checkLeftToRight :: ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkLeftToRight _ [] = 0
 checkLeftToRight evaluate grid
-  | all null grid = 0
-  | otherwise = evaluate grid + checkLeftToRight evaluate (map tail grid)
+    | all null grid = 0
+    | otherwise = evaluate grid + checkLeftToRight evaluate (map tail grid)
 
 checkTopToBottom :: Int -> ([[XMAS]] -> Int) -> [[XMAS]] -> Int
 checkTopToBottom _ _ [] = 0
@@ -71,11 +73,11 @@ doIndexesGiveMAS = areValuesAtIndexes [M, A, S]
 
 checkMASInX :: [[XMAS]] -> Bool
 checkMASInX grid =
-  all
-    (any (doIndexesGiveMAS grid . uncurry zip))
-    [ [(zTo2, zTo2), (twoTo0, twoTo0)],
-      [(zTo2, twoTo0), (twoTo0, zTo2)]
-    ]
+    all
+        (any (doIndexesGiveMAS grid . uncurry zip))
+        [ [(zTo2, zTo2), (twoTo0, twoTo0)]
+        , [(zTo2, twoTo0), (twoTo0, zTo2)]
+        ]
 
 partB :: Input -> OutputB
 partB = checkTopToBottom 3 (fromEnum . checkMASInX)

@@ -17,10 +17,10 @@ type OutputA = Int
 type OutputB = Int
 
 data Result = Win | Draw | Lose
-  deriving (Show, Eq)
+    deriving (Show, Eq)
 
 data Shape = Rock | Paper | Scissors
-  deriving (Show, Eq)
+    deriving (Show, Eq)
 
 type Match1 = (Shape, Shape)
 

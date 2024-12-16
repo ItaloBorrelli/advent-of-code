@@ -45,8 +45,20 @@ library
       AOC.Y2024.Day02
       AOC.Y2024.Day03
       AOC.Y2024.Day04
+      AOC.Y2024.Day05
+      AOC.Y2024.Day06
+      AOC.Y2024.Day07
+      AOC.Y2024.Day08
+      AOC.Y2024.Day09
+      AOC.Y2024.Day10
+      AOC.Y2024.Day11
+      AOC.Y2024.Day12
+      AOC.Y2024.Day13
+      AOC.Y2024.Day14
+      AOC.Y2024.Day15
       Program.Color
       Program.RunDay
+      Util.Days
       Util.Util
   other-modules:
       Paths_advent_of_code
@@ -64,11 +76,13 @@ library
       GHC2021
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      ansi-terminal
+      ListZipper
+    , ansi-terminal
     , base >=4.7 && <5
     , containers
     , data-aviary
     , directory
+    , extra >=1.8
     , mtl
     , optparse-applicative
     , parsec
@@ -88,12 +102,14 @@ executable advent-of-code-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      advent-of-code
+      ListZipper
+    , advent-of-code
     , ansi-terminal
     , base >=4.7 && <5
     , containers
     , data-aviary
     , directory
+    , extra >=1.8
     , mtl
     , optparse-applicative
     , parsec
@@ -114,12 +130,14 @@ test-suite advent-of-code-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N4 -with-rtsopts=-qa -with-rtsopts=-C0 -funfolding-use-threshold=16 -fexcess-precision -optc-O3 -optc-ffast-math -O2
   build-depends:
-      advent-of-code
+      ListZipper
+    , advent-of-code
     , ansi-terminal
     , base >=4.7 && <5
     , containers
     , data-aviary
     , directory
+    , extra >=1.8
     , hspec >=2.7
     , mtl
     , optparse-applicative

@@ -1,0 +1,248 @@
+#!/bin/bash
+
+if [[ -f .env ]]; then
+    source .env
+fi
+
+year=$YEAR
+day=$DAY
+ALL_DAYS=false
+INIT=false
+RUN=false
+TEST=false
+INPUT_FILE=""
+
+show_help() {
+    echo "Usage: aoc [-h] "
+    echo "Options:"
+    echo "  -a, --all-days       Run or test all days"
+    echo "  -t, --test           Run tests"
+    echo "  -g, --init           Initialize a new day"
+    echo "  -i, --input FILE     Specify input file"
+    echo "  -r, --run            Run the solution"
+    echo "  -y, --year YEAR      Specify the year (four digits)"
+    echo "  -d, --day DAY        Specify the day (two digits)"
+    echo "  -h, --help           Show this help message"
+}
+
+get_all_flags() {
+    while getopts "atgiry:d:h-:" opt; do
+        case $opt in
+            a) ALL_DAYS=true;;
+            t) TEST=true;;
+            g) INIT=true;;
+            i) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+            r) RUN=true;;
+            y) year="$OPTARG";;
+            d) day="$OPTARG";;
+            h) show_help; exit 0;;
+            -)
+                case "${OPTARG}" in
+                    all-days) ALL_DAYS=true;;
+                    init) INIT=true;;
+                    run) RUN=true;;
+                    test) TEST=true;;
+                    input) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    year)
+                        year="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    day)
+                        day="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
+                    help) show_help; exit 0;;
+                    *) echo "Unknown flag: -${OPTARG}";;
+                esac;;
+            *) show_help; exit 1;;
+        esac
+    done
+}
+
+validate_date() {
+    RESULT=0
+
+    if [[ ! -z $year && ! $year =~ ^[0-9]{4}$ ]]; then
+        echo "Invalid year: $year"
+        echo "Must be four digits long"
+        RESULT=1
+    fi
+
+    if [[ ! -z $day ]] && [[ ! $day =~ ^[0-9]{2}$ ]]; then
+        echo "Invalid day: $day"
+        echo "Must be two digits long"
+        RESULT=1
+    fi
+
+    if [[ RESULT == 1 ]]; then
+        exit 1
+    fi
+
+    return $RESULT
+}
+
+use_today_if_no_date() {
+    if [[ -z $YEAR ]]; then
+        export YEAR=${YEAR:-$(TZ=America/New_York date +%Y)}
+    fi
+
+    if [[ -z $DAY ]]; then
+        export DAY=${DAY:-$(TZ=America/New_York date +%d)}
+    fi
+}
+
+get_all_flags "$@"
+
+if [ ! -f app/Main.hs -o ! -f test/Spec.hs ]; then
+    echo
+    echo "Error: app/Main.hs or test/Spec.hs not found. Are you sure you're in the right directory?"
+    echo
+    exit 1
+fi
+
+if ([ "$RUN" = true ] && [ "$TEST" = true ]) || ([ "$RUN" = true ] && [ "$INIT" = true ]) || ([ "$TEST" = true ] && [ "$INIT" = true ]); then
+    echo "Error: Options --run|-r, --test|-t, and --init|-g cannot be used together."
+    show_help
+    exit 1
+fi
+
+if [ "$TEST" = true ]; then
+    if [ "$ALL_DAYS" = false ]; then
+        validate_date "$year" "$day"
+        if [[ $? -ne 0 ]]; then
+            exit 1
+        fi
+        use_today_if_no_date
+        stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/" --progress-bar=none 
+    else
+        stack run -- --all-days
+    fi
+    exit 0
+fi
+
+if [ "$RUN" = true ]; then
+    if [ "$ALL_DAYS" = false ]; then
+        validate_date "$year" "$day"
+        if [[ $? -ne 0 ]]; then
+            exit 1
+        fi
+        use_today_if_no_date
+        if [ -z "$INPUT_FILE" ]; then
+            stack run -- -d ${YEAR}${DAY} --timings
+        else
+            stack run -- -d ${YEAR}${DAY} -i "$INPUT_FILE" --timings
+        fi
+    else
+        stack run -- --all-days --timings
+    fi
+    exit 0
+fi
+
+init() {
+    echo "Year: $YEAR"
+    echo "Day: $DAY"
+    echo
+    echo "This will initialize the folder and file structure for the given day."
+    echo "Are you satisfied with the above values?"
+    echo "Note: Content will not be deleted if files already exist"
+    echo
+    read -p "Continue? (y/n) " confirm
+    if [[ $confirm != [yY] ]]; then
+        echo "Change the .env file to provide export the desired YEAR and DAY OR provide both/either value in the command line input."
+        echo "Otherwise todays day and year will be used."
+        exit 1
+    fi
+
+    echo
+
+    INPUT_DIR="inputs/$YEAR/$DAY"
+
+    mkdir -p $INPUT_DIR
+
+    INPUT_FILE_NAME="input.txt"
+    INPUT_FILE="$INPUT_DIR/$INPUT_FILE_NAME"
+    if [ ! -f $INPUT_FILE ]; then
+        touch $INPUT_FILE
+        echo "Created '$INPUT_FILE_NAME' in '$INPUT_DIR'"
+    fi
+
+    TEST_ANSWER_FILE_NAME="test-answers.txt"
+    TEST_ANSWER_FILE="$INPUT_DIR/$TEST_ANSWER_FILE_NAME"
+    if [ ! -f $TEST_ANSWER_FILE ]; then
+        touch $TEST_ANSWER_FILE
+        echo "Couldn't run Part A!" >> $TEST_ANSWER_FILE
+        echo "Couldn't run Part B!" >> $TEST_ANSWER_FILE
+        echo "Created '$TEST_ANSWER_FILE_NAME' in '$INPUT_DIR'"
+    fi
+
+    TEST_INPUT_FILE_NAME="test-input.txt"
+    TEST_INPUT_FILE="$INPUT_DIR/$TEST_INPUT_FILE_NAME"
+    if [ ! -f $TEST_INPUT_FILE ]; then
+        touch $TEST_INPUT_FILE
+        echo "Created '$TEST_INPUT_FILE_NAME' in '$INPUT_DIR'"
+    fi
+
+    SOLVE_DIR="src/AOC/Y$YEAR"
+    SOLVE_FILE_NAME="Day$DAY.hs"
+    SOLUTION_FILE="$SOLVE_DIR/$SOLVE_FILE_NAME"
+    if [ ! -f $SOLUTION_FILE ]; then
+        mkdir -p $SOLVE_DIR
+        cp ./Day.hs.template $SOLUTION_FILE
+        sed -i "s/YYYYY\.DayXX/Y$YEAR.Day$DAY/g" $SOLUTION_FILE
+        echo "Created '$SOLVE_FILE_NAME' in '$SOLVE_DIR'"
+    else
+        echo "Existing file '$SOLVE_FILE_NAME' in '$SOLVE_DIR'"
+    fi
+
+    MAIN_FILE="src/Util/Days.hs"
+    IMPORT_STATEMENT="import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
+    IMPORT_PREFIX=${IMPORT_STATEMENT:0:32}
+    if ! grep -q "$IMPORT_PREFIX" "$MAIN_FILE"; then
+        sed -i "/-- Day imports/ { :a; n; /^import /! { s/.*/$IMPORT_STATEMENT\n&/; b }; ba }" "$MAIN_FILE"
+        echo "Import statement added to '$MAIN_FILE'"
+    else
+        echo "Existing import in '$MAIN_FILE'"
+    fi
+
+    INSERT_STATEMENT="(${YEAR}${DAY}, (Y${YEAR}Day${DAY}.runDay, \"inputs/${YEAR}/${DAY}/input.txt\"))"
+    if ! grep -q "$INSERT_STATEMENT" "$MAIN_FILE"; then
+        sed -i -E "s/(input.txt\"\)\))$/\1,/g" "$MAIN_FILE"
+        sed -i "/-- Insert new days here/,/]/ { 
+            /^[[:space:]]*]/ i \      $INSERT_STATEMENT
+        }" "$MAIN_FILE"
+        echo "runDay added to '$MAIN_FILE'"
+    else
+        echo "Existing day entry in  '$MAIN_FILE'"
+    fi
+
+    SPEC_FILE="test/Spec.hs"
+    TEST_STATEMENT="it \"${YEAR}${DAY}\" $ do runDay (\"${YEAR}\", \"${DAY}\")"
+    if ! grep -q "$TEST_STATEMENT" "$SPEC_FILE"; then
+        sed -i "/-- Add new tests here/ a \    $TEST_STATEMENT" "$SPEC_FILE"
+        echo "Test entry added to '$SPEC_FILE'"
+    else
+        echo "Existing test entry in '$SPEC_FILE'"
+    fi
+
+    echo
+
+    if [[ $PROMPT_VSCODE == true ]]; then
+        read -p "Open up files in VS Code immediately? (y/n) " confirm
+        if [[ $confirm == [yY] ]]; then
+            code "$TEST_ANSWER_FILE" "$TEST_INPUT_FILE" "$INPUT_FILE" "$SOLUTION_FILE"
+            echo
+        fi
+    fi
+
+    echo "Done! Good luck!"
+
+    echo
+}
+
+if [ "$INIT" = true ]; then
+    validate_date "$year" "$day"
+    if [[ $? -ne 0 ]]; then
+        exit 1
+    fi
+    export YEAR=$year
+    export DAY=$day
+    use_today_if_no_date
+    init
+fi
+
