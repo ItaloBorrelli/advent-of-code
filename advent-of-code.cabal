@@ -42,6 +42,7 @@ library
       AOC.Y2024.Day13
       AOC.Y2024.Day14
       AOC.Y2024.Day15
+      AOC.Y2024.Day16
       Program.Color
       Program.RunDay
       Util.Days
