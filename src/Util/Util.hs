@@ -18,8 +18,8 @@ where
 
 import Data.Map.Strict (Map, findWithDefault, keys)
 import Data.Map.Strict qualified as Map
-import Debug.Trace (trace)
 import Data.String (IsString)
+import Debug.Trace (trace)
 
 {-
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
@@ -37,17 +37,14 @@ freq = Map.fromListWith (+) . fmap (,1)
 --     Output: Map.fromList [((0,0),a), ((0,1),b), ((0,2),c), ((1,0),d), ((1,1),e)]
 mapFromNestedLists :: [[a]] -> Map (Int, Int) a
 mapFromNestedLists = Map.fromList . attachCoords 0 0
-  where
-    attachCoords _ _ [] = []
-    attachCoords x _ ([] : ls) = attachCoords (x + 1) 0 ls
-    attachCoords x y ((l : ls) : lss) = ((x, y), l) : attachCoords x (y + 1) (ls : lss)
 
 mapFromNestedLists' :: [[a]] -> Map (Int, Int) a
 mapFromNestedLists' = Map.fromList . attachCoords 0 0
-  where
-    attachCoords _ _ [] = []
-    attachCoords x _ ([] : ls) = attachCoords (x + 1) 0 ls
-    attachCoords x y ((l : ls) : lss) = ((y, x), l) : attachCoords x (y + 1) (ls : lss)
+
+attachCoords :: Int -> Int -> [[a]] -> [((Int, Int), a)]
+attachCoords _ _ [] = []
+attachCoords x _ ([] : ls) = attachCoords (x + 1) 0 ls
+attachCoords x y ((l : ls) : lss) = ((y, x), l) : attachCoords x (y + 1) (ls : lss)
 
 -- Splits a list into chunks of the specified size.
 -- The final chunk may be smaller than the chunk size.

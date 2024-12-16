@@ -36,6 +36,7 @@ dependencies:
 - ListZipper
 - unordered-containers
 - hashable
+- heap
 
 ghc-options:
 - -Wall

@@ -1,14 +1,14 @@
 module AOC.Y2024.Day15 (runDay) where
 
-import           Data.Void (Void)
-import qualified Program.RunDay   as R (Day, runDay)
-import           Text.Parsec (char, (<|>), many, sepBy, newline, oneOf, eof)
-import           Text.Parsec.Text (Parser)
-import Data.Map.Lazy ( Map, insert, (!), keys,delete )
+import Data.Bifunctor (Bifunctor (first, second))
 import Data.List (transpose)
-import Util.Util (mapFromNestedLists')
-import Data.Bifunctor (Bifunctor(second, first))
+import Data.Map.Lazy (Map, delete, insert, keys, (!))
 import Data.Maybe (fromJust)
+import Data.Void (Void)
+import Program.RunDay qualified as R (Day, runDay)
+import Text.Parsec (char, eof, many, newline, oneOf, sepBy, (<|>))
+import Text.Parsec.Text (Parser)
+import Util.Util (mapFromNestedLists')
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -55,10 +55,10 @@ toMap = mapFromNestedLists' . map (map (\case O' -> O; W' -> W; _ -> N))
 
 rupdate :: [X] -> [Y']
 rupdate [] = []
-rupdate (v:vs) = case v of
-    O' -> OL:OR:rupdate vs
-    W' -> WW:WW:rupdate vs
-    _ -> NN:NN:rupdate vs
+rupdate (v : vs) = case v of
+    O' -> OL : OR : rupdate vs
+    W' -> WW : WW : rupdate vs
+    _ -> NN : NN : rupdate vs
 
 mupdate :: Grid -> M'
 mupdate = mapFromNestedLists' . map rupdate
@@ -70,23 +70,30 @@ inputParser = (\g d -> (start g, toMap g, mupdate g, concat d)) <$> parseMapLine
 
 step :: D -> C -> C
 step U = second (\x -> x - 1)
-step R = first (1+)
-step D = second (1+)
+step R = first (1 +)
+step D = second (1 +)
 step L = first (\x -> x - 1)
 
 move :: M -> D -> C -> (M, C)
 move m d c =
-    let c' = step d c
-    in case m ! c' of
-        O -> let (m', o') = move m d c'
-             in if o' == c' then (m, c) else (insert o' O m', c')
-        W -> (m, c)
-        N -> (m, c')
+    let
+        c' = step d c
+     in
+        case m ! c' of
+            O ->
+                let
+                    (m', o') = move m d c'
+                 in
+                    if o' == c' then (m, c) else (insert o' O m', c')
+            W -> (m, c)
+            N -> (m, c')
 
 moveFish :: M -> D -> A -> (M, A)
 moveFish m d a =
-    let (m', a') = move m d a
-    in if a' == a then (m, a) else (insert a' N m', a')
+    let
+        (m', a') = move m d a
+     in
+        if a' == a then (m, a) else (insert a' N m', a')
 
 gps :: C -> Int
 gps (x, y) = x + y * 100
@@ -103,20 +110,22 @@ partA (a, m, _, ds) = boxCheck $ fst $ foldl (\(m', a') d -> moveFish m' d a') (
 
 toMove :: M' -> D -> C -> Maybe [(Y', C, C)]
 toMove m d from =
-    let to = step d from
+    let
+        to = step d from
         obj = m ! to
-    in case obj of
-        WW -> Nothing
-        NN -> Just [(m ! from, from, to)]
-        _ -> if d == L || d == R
-            then case toMove m d to of
-                Nothing -> Nothing
-                Just cs -> Just ((m ! from, from, to):cs)
-            else
-                case if obj == OL then (toMove m d to, toMove m d (step R to)) else (toMove m d (step L to), toMove m d to) of
-                (Nothing, _) -> Nothing
-                (_, Nothing) -> Nothing
-                (Just lc', Just rc') -> Just ((m ! from, from, to):(lc' ++ rc'))
+     in
+        case obj of
+            WW -> Nothing
+            NN -> Just [(m ! from, from, to)]
+            _ ->
+                if d == L || d == R
+                    then case toMove m d to of
+                        Nothing -> Nothing
+                        Just cs -> Just ((m ! from, from, to) : cs)
+                    else case if obj == OL then (toMove m d to, toMove m d (step R to)) else (toMove m d (step L to), toMove m d to) of
+                        (Nothing, _) -> Nothing
+                        (_, Nothing) -> Nothing
+                        (Just lc', Just rc') -> Just ((m ! from, from, to) : (lc' ++ rc'))
 
 moveFish' :: M' -> D -> A -> (M', A)
 moveFish' m d a = case toMove m d a of

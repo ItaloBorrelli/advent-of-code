@@ -25,6 +25,13 @@ packages:
       size: 1578
   original:
     hackage: hashable-1.4.7.0
+- completed:
+    hackage: heap-1.0.4@sha256:d2492138714916700b2f66855f99f54bd51684c375121b73be114cafcbdb1504,1632
+    pantry-tree:
+      sha256: 4d72e0bb8f03e30171499e85130d10149b3d96d385d57180c91838f66952db32
+      size: 648
+  original:
+    hackage: heap-1.0.4
 snapshots:
 - completed:
     sha256: 08bd13ce621b41a8f5e51456b38d5b46d7783ce114a50ab604d6bbab0d002146

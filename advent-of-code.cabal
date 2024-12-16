@@ -71,6 +71,7 @@ library
     , directory
     , extra >=1.8
     , hashable
+    , heap
     , mtl
     , optparse-applicative
     , parsec
@@ -100,6 +101,7 @@ executable advent-of-code-exe
     , directory
     , extra >=1.8
     , hashable
+    , heap
     , mtl
     , optparse-applicative
     , parsec
@@ -130,6 +132,7 @@ test-suite advent-of-code-test
     , directory
     , extra >=1.8
     , hashable
+    , heap
     , hspec >=2.7
     , mtl
     , optparse-applicative
