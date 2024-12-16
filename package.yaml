@@ -34,6 +34,8 @@ dependencies:
 - vector
 - data-aviary
 - ListZipper
+- unordered-containers
+- hashable
 
 ghc-options:
 - -Wall

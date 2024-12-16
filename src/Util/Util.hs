@@ -16,9 +16,10 @@ module Util.Util
     )
 where
 
-import Data.Map.Strict (Map, (!?), keys)
+import Data.Map.Strict (Map, findWithDefault, keys)
 import Data.Map.Strict qualified as Map
 import Debug.Trace (trace)
+import Data.String (IsString)
 
 {-
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
@@ -104,7 +105,7 @@ safeTake _ [] = []
 safeTake n (x : xs) = x : safeTake (n - 1) xs
 
 -- Function to trace/display the Map
-traceMap :: (Show a) => Map (Int, Int) a -> String
+traceMap :: (Show a, IsString a) => Map (Int, Int) a -> String
 traceMap m =
     let
         allKeys = keys m
