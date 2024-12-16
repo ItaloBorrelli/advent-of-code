@@ -190,7 +190,7 @@ init() {
         echo "Existing file '$SOLVE_FILE_NAME' in '$SOLVE_DIR'"
     fi
 
-    MAIN_FILE="app/Main.hs"
+    MAIN_FILE="src/Util/Days.hs"
     IMPORT_STATEMENT="import qualified AOC.Y$YEAR.Day$DAY as Y${YEAR}Day${DAY}"
     IMPORT_PREFIX=${IMPORT_STATEMENT:0:32}
     if ! grep -q "$IMPORT_PREFIX" "$MAIN_FILE"; then
