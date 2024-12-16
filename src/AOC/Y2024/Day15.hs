@@ -6,10 +6,9 @@ import           Text.Parsec (char, (<|>), many, sepBy, newline, oneOf, eof)
 import           Text.Parsec.Text (Parser)
 import Data.Map.Lazy ( Map, insert, (!), keys,delete )
 import Data.List (transpose)
-import Util.Util (mapFromNestedLists)
+import Util.Util (mapFromNestedLists')
 import Data.Bifunctor (Bifunctor(second, first))
 import Data.Maybe (fromJust)
-import Debug.Trace (trace)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -24,17 +23,21 @@ data X = O' | W' | N' | S deriving (Eq, Show)
 
 data Y = O | W | N deriving (Eq, Show)
 
+data Y' = OL | OR | WW | NN deriving (Eq, Show)
+
 data D = U | R | D | L deriving (Eq, Show)
 
 type Grid = [[X]]
 
 type M = Map C Y
 
-type Input = (A, M, [D])
+type M' = Map C Y'
+
+type Input = (A, M, M', [D])
 
 type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ----------- PARSER -------------
 
@@ -45,13 +48,23 @@ parseDirections :: Parser [D]
 parseDirections = many (U <$ char '^' <|> R <$ char '>' <|> D <$ char 'v' <|> L <$ char '<')
 
 start :: Grid -> C
-start = head . concatMap (\(y, row) -> [(x, y) | (x, v) <- zip [0 ..] row, v == S]) . zip [0 ..]
+start = head . concatMap (\(y, row) -> [(y, x) | (x, v) <- zip [0 ..] row, v == S]) . zip [0 ..]
 
 toMap :: Grid -> M
-toMap = mapFromNestedLists . transpose . map (map (\case O' -> O; W' -> W; _ -> N))
+toMap = mapFromNestedLists' . map (map (\case O' -> O; W' -> W; _ -> N))
+
+rupdate :: [X] -> [Y']
+rupdate [] = []
+rupdate (v:vs) = case v of
+    O' -> OL:OR:rupdate vs
+    W' -> WW:WW:rupdate vs
+    _ -> NN:NN:rupdate vs
+
+mupdate :: Grid -> M'
+mupdate = mapFromNestedLists' . map rupdate
 
 inputParser :: Parser Input
-inputParser = (\g d -> (start g, toMap g, concat d)) <$> parseMapLine `sepBy` newline <*> parseDirections `sepBy` newline <* eof
+inputParser = (\g d -> (start g, toMap g, mupdate g, concat d)) <$> parseMapLine `sepBy` newline <*> parseDirections `sepBy` newline <* eof
 
 ----------- PART A&B -----------
 
@@ -76,7 +89,7 @@ moveFish m d a =
     in if a' == a then (m, a) else (insert a' N m', a')
 
 gps :: C -> Int
-gps (y, x) = y + x * 100
+gps (x, y) = x + y * 100
 
 boxCheck :: M -> Int
 boxCheck m = foldl (\n k -> if m ! k == O then n + gps k else n) 0 (keys m)
@@ -84,9 +97,34 @@ boxCheck m = foldl (\n k -> if m ! k == O then n + gps k else n) 0 (keys m)
 ----------- PART A -------------
 
 partA :: Input -> OutputA
-partA (a, m, ds) = boxCheck $ fst $ foldl (\(m', a') d -> moveFish m' d a') (m, a) ds
+partA (a, m, _, ds) = boxCheck $ fst $ foldl (\(m', a') d -> moveFish m' d a') (m, a) ds
 
 ----------- PART B -------------
 
+toMove :: M' -> D -> C -> Maybe [(Y', C, C)]
+toMove m d from =
+    let to = step d from
+        obj = m ! to
+    in case obj of
+        WW -> Nothing
+        NN -> Just [(m ! from, from, to)]
+        _ -> if d == L || d == R
+            then case toMove m d to of
+                Nothing -> Nothing
+                Just cs -> Just ((m ! from, from, to):cs)
+            else
+                case if obj == OL then (toMove m d to, toMove m d (step R to)) else (toMove m d (step L to), toMove m d to) of
+                (Nothing, _) -> Nothing
+                (_, Nothing) -> Nothing
+                (Just lc', Just rc') -> Just ((m ! from, from, to):(lc' ++ rc'))
+
+moveFish' :: M' -> D -> A -> (M', A)
+moveFish' m d a = case toMove m d a of
+    Nothing -> (m, a)
+    Just cs -> ((\m'' -> foldl (\m' (obj, _, c') -> insert c' obj m') m'' cs) (foldl (\m' (_, c, _) -> insert c NN m') m cs), step d a)
+
+boxCheck' :: M' -> Int
+boxCheck' m = foldl (\n k -> if m ! k == OL then n + gps k else n) 0 (keys m)
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB ((x, y), _, m, ds) = boxCheck' $ fst $ foldl (\(m', a') d -> moveFish' m' d a') (m, (y * 2, x)) ds
