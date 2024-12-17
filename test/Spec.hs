@@ -75,3 +75,4 @@ main = hspec $ do
         it "202413" $ do runDay ("2024", "13")
         it "202414" $ do runDay ("2024", "14")
         it "202415" $ do runDay ("2024", "15")
+        it "202417" $ do runDay ("2024", "17")

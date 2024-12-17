@@ -1,14 +1,11 @@
 module AOC.Y2024.Day15 (runDay) where
 
-import           Data.Void (Void)
-import qualified Program.RunDay   as R (Day, runDay)
-import           Text.Parsec (char, (<|>), many, sepBy, newline, oneOf, eof)
-import           Text.Parsec.Text (Parser)
-import Data.Map.Lazy ( Map, insert, (!), keys,delete )
-import Data.List (transpose)
+import Data.Bifunctor (Bifunctor (first, second))
 import Util.Util (mapFromNestedLists')
-import Data.Bifunctor (Bifunctor(second, first))
-import Data.Maybe (fromJust)
+import Data.Map.Lazy (Map, insert, keys, (!))
+import Program.RunDay qualified as R (Day, runDay)
+import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
+import Text.Parsec.Text (Parser)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -70,23 +67,30 @@ inputParser = (\g d -> (start g, toMap g, mupdate g, concat d)) <$> parseMapLine
 
 step :: D -> C -> C
 step U = second (\x -> x - 1)
-step R = first (1+)
-step D = second (1+)
+step R = first (1 +)
+step D = second (1 +)
 step L = first (\x -> x - 1)
 
 move :: M -> D -> C -> (M, C)
 move m d c =
-    let c' = step d c
-    in case m ! c' of
-        O -> let (m', o') = move m d c'
-             in if o' == c' then (m, c) else (insert o' O m', c')
-        W -> (m, c)
-        N -> (m, c')
+    let
+        c' = step d c
+     in
+        case m ! c' of
+            O ->
+                let
+                    (m', o') = move m d c'
+                 in
+                    if o' == c' then (m, c) else (insert o' O m', c')
+            W -> (m, c)
+            N -> (m, c')
 
 moveFish :: M -> D -> A -> (M, A)
 moveFish m d a =
-    let (m', a') = move m d a
-    in if a' == a then (m, a) else (insert a' N m', a')
+    let
+        (m', a') = move m d a
+     in
+        if a' == a then (m, a) else (insert a' N m', a')
 
 gps :: C -> Int
 gps (x, y) = x + y * 100
