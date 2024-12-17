@@ -3,7 +3,7 @@ module AOC.Y2024.Day16 (runDay) where
 import Data.Bifunctor (first, second)
 import Data.Heap (MinPrioHeap)
 import Data.Heap qualified as H
-import Data.Map.Strict (Map, (!?))
+import Data.Map.Strict (Map, (!), (!?))
 import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust, fromMaybe)
 import Data.Set (Set)
@@ -43,9 +43,9 @@ type M = Map C Y
 
 type Input = (R, E, M)
 
-type OutputA = Input
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 ----------- PARSER -------------
 
@@ -82,10 +82,10 @@ addDist _ _ = Infinity
 
 type V = (C, D)
 
-type M' = Map V [(V, Int)]
+type EdgeMap = Map V [(V, Int)]
 
 newtype Graph = Graph
-    {edges :: M'}
+    {edges :: EdgeMap}
     deriving (Show)
 
 data DijkstraState = DijkstraState
@@ -149,7 +149,7 @@ makeEdges c dirFrom (x : xs)
     to = (step x c, x)
     rest = makeEdges c dirFrom xs
 
-constructEdges :: M -> C -> M' -> M'
+constructEdges :: M -> C -> EdgeMap -> EdgeMap
 constructEdges m c prev = foldl insertEdge prev moreEdges
   where
     adjs = map fromJust $ filter (/= Nothing) $ map (\d -> let c' = step d c in case m !? c' of Just N -> Just d; _ -> Nothing) [U, R, L, D]
@@ -165,5 +165,43 @@ partA (r, e, m) = (\m' -> minimum $ map (\d -> m' !?? (e, d)) [U, D, L, R]) $ (\
 
 ----------- PART B -------------
 
+type Q = MinPrioHeap (Distance Int) V
+
+data PathState = PathState {
+  q :: Q,
+  onPath :: Set V
+}
+
+findOnPath :: V -> V -> Map V (Distance Int) -> EdgeMap -> Set V
+findOnPath src e distanceMap adjs = processQueue (PathState q s)
+  where
+    q = H.fromList [(Dist 0, src)]
+    s = S.singleton src
+    processQueue :: PathState -> Set V
+    processQueue (PathState q0 s0) = case H.view q0 of
+        Nothing -> S.empty
+        Just (from@(dFrom, vFrom), q1) ->
+          let nexts = filter (\(v, d) -> distanceMap ! v == addDist dFrom (Dist d)) $ adjs ! vFrom
+          in foldNeighbor (PathState q1)
+
+          --       pathTo = (\(c, d) -> c) $ (adjs ! vFrom)
+          --    in
+          --       if addDist prevDist (Dist pathTo) == newDist
+          --           then
+          --               if to == e
+          --                   then x1
+          --                   else case adjs !? src of
+          --                       Nothing -> S.empty
+          --                       Just unvisitedNeighbors -> processQueue curr $ foldl (\n tt -> foldNeighbor n tt) (PathState x1 q1) unvisitedNeighbors
+          --           else S.empty
+          -- where
+          --   x1 = S.insert to x0
+          --   foldNeighbor :: PathState -> V -> PathState
+          --   foldNeighbor (PathState xs qs) v = PathState xs (H.insert (distanceMap ! v, v) qs)
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB (r, e, m) = length $ findOnPath (r, U) (e, U) distances edges
+  where
+    ks = M.keys m
+    edges = foldl (\m' k -> case m !? k of Just N -> constructEdges m k m'; _ -> m') M.empty ks
+    distances = (\g -> findShortestDistance g (r, U)) $ Graph edges
