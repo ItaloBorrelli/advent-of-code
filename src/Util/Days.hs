@@ -26,10 +26,11 @@ import AOC.Y2024.Day14 qualified as Y2024Day14
 import AOC.Y2024.Day15 qualified as Y2024Day15
 import AOC.Y2024.Day17 qualified as Y2024Day17
 import AOC.Y2024.Day19 qualified as Y2024Day19
+
+import Data.Map
     ( Map
     , fromList
     )
-import Data.Map
 import Program.RunDay
     ( Day
     )
