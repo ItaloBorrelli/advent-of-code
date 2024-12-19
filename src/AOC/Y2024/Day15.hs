@@ -1,11 +1,11 @@
 module AOC.Y2024.Day15 (runDay) where
 
 import Data.Bifunctor (Bifunctor (first, second))
-import Util.Util (mapFromNestedLists')
 import Data.Map.Lazy (Map, insert, keys, (!))
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
+import Util.Util (mapFromNestedLists')
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -52,10 +52,10 @@ toMap = mapFromNestedLists' . map (map (\case O' -> O; W' -> W; _ -> N))
 
 rupdate :: [X] -> [Y']
 rupdate [] = []
-rupdate (v:vs) = case v of
-    O' -> OL:OR:rupdate vs
-    W' -> WW:WW:rupdate vs
-    _ -> NN:NN:rupdate vs
+rupdate (v : vs) = case v of
+    O' -> OL : OR : rupdate vs
+    W' -> WW : WW : rupdate vs
+    _ -> NN : NN : rupdate vs
 
 mupdate :: Grid -> M'
 mupdate = mapFromNestedLists' . map rupdate
@@ -107,20 +107,22 @@ partA (a, m, _, ds) = boxCheck $ fst $ foldl (\(m', a') d -> moveFish m' d a') (
 
 toMove :: M' -> D -> C -> Maybe [(Y', C, C)]
 toMove m d from =
-    let to = step d from
+    let
+        to = step d from
         obj = m ! to
-    in case obj of
-        WW -> Nothing
-        NN -> Just [(m ! from, from, to)]
-        _ -> if d == L || d == R
-            then case toMove m d to of
-                Nothing -> Nothing
-                Just cs -> Just ((m ! from, from, to):cs)
-            else
-                case if obj == OL then (toMove m d to, toMove m d (step R to)) else (toMove m d (step L to), toMove m d to) of
-                (Nothing, _) -> Nothing
-                (_, Nothing) -> Nothing
-                (Just lc', Just rc') -> Just ((m ! from, from, to):(lc' ++ rc'))
+     in
+        case obj of
+            WW -> Nothing
+            NN -> Just [(m ! from, from, to)]
+            _ ->
+                if d == L || d == R
+                    then case toMove m d to of
+                        Nothing -> Nothing
+                        Just cs -> Just ((m ! from, from, to) : cs)
+                    else case if obj == OL then (toMove m d to, toMove m d (step R to)) else (toMove m d (step L to), toMove m d to) of
+                        (Nothing, _) -> Nothing
+                        (_, Nothing) -> Nothing
+                        (Just lc', Just rc') -> Just ((m ! from, from, to) : (lc' ++ rc'))
 
 moveFish' :: M' -> D -> A -> (M', A)
 moveFish' m d a = case toMove m d a of
