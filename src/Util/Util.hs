@@ -25,6 +25,7 @@ import Debug.Trace (trace)
 import Text.Parsec (digit, satisfy, skipMany)
 import Text.Parsec.Text (Parser)
 import Text.ParserCombinators.Parsec (many)
+import Data.String (IsString)
 
 {-
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
@@ -110,7 +111,7 @@ safeTake _ [] = []
 safeTake n (x : xs) = x : safeTake (n - 1) xs
 
 -- Function to trace/display the Map
-traceMap :: (Show a) => Map (Int, Int) a -> String
+traceMap :: (Show a, IsString a) => Map (Int, Int) a -> String
 traceMap m =
     let
         allKeys = keys m
