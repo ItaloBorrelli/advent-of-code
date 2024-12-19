@@ -13,12 +13,19 @@ module Util.Util
     , tupleUp
     , twiceAsNice
     , allFoldl
+    , skipNonDigits
+    , unsignedInt
     )
 where
 
-import Data.Map.Strict (Map, (!?), keys)
+import Data.Map.Strict ( Map, keys, findWithDefault )
+import Data.Char (isDigit)
 import Data.Map.Strict qualified as Map
 import Debug.Trace (trace)
+import Text.Parsec (digit, satisfy, skipMany)
+import Text.Parsec.Text (Parser)
+import Text.ParserCombinators.Parsec (many)
+import Data.String (IsString)
 
 {-
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
@@ -104,7 +111,7 @@ safeTake _ [] = []
 safeTake n (x : xs) = x : safeTake (n - 1) xs
 
 -- Function to trace/display the Map
-traceMap :: (Show a) => Map (Int, Int) a -> String
+traceMap :: (Show a, IsString a) => Map (Int, Int) a -> String
 traceMap m =
     let
         allKeys = keys m
@@ -135,3 +142,9 @@ twiceAsNice f t1 t2 = f (uncurry f t1) (uncurry f t2)
 allFoldl :: (a -> b -> a -> b) -> b -> [a] -> b
 allFoldl _ y [] = y
 allFoldl f y (x : xs) = allFoldl f (foldl (f x) y xs) xs
+
+skipNonDigits :: Parser ()
+skipNonDigits = skipMany (satisfy (not . isDigit))
+
+unsignedInt :: Parser Int
+unsignedInt = read <$> many digit
