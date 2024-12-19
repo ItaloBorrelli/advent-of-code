@@ -1,10 +1,10 @@
 module AOC.Y2024.Day13 (runDay) where
 
-import Data.Char (isDigit)
 import Data.Tuple.Extra (both)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (digit, eof, many, newline, satisfy, sepBy, skipMany, skipMany1)
+import Text.Parsec (eof, newline, sepBy, skipMany1)
 import Text.Parsec.Text (Parser)
+import Util.Util (skipNonDigits, unsignedInt)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -27,14 +27,8 @@ type OutputB = Int
 
 ----------- PARSER -------------
 
-num :: Parser Int
-num = read <$> many digit
-
-skipNonDigits :: Parser ()
-skipNonDigits = skipMany (satisfy (not . isDigit))
-
 parseDigitPair :: Parser (Int, Int)
-parseDigitPair = (,) <$> (skipNonDigits *> num) <*> (skipNonDigits *> num)
+parseDigitPair = (,) <$> (skipNonDigits *> unsignedInt) <*> (skipNonDigits *> unsignedInt)
 
 parseE :: Parser E
 parseE = (,,) <$> parseDigitPair <*> parseDigitPair <*> parseDigitPair

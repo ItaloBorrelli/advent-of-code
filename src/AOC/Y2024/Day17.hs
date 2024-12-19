@@ -3,14 +3,11 @@ module AOC.Y2024.Day17 (runDay) where
 import Data.Bits (Bits ((.&.), (.|.)), shiftL, shiftR, xor)
 import Data.List (intercalate)
 import Data.List.Extra ((!?))
-import Data.Maybe (isNothing)
-import Data.Set (Set, empty, insert)
-import Debug.Trace (trace)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, digit, sepBy, string)
-import Text.Parsec.Char (newline)
+import Text.Parsec (char, digit, sepBy)
 import Text.Parsec.Text (Parser)
 import Text.ParserCombinators.Parsec (many1)
+import Util.Util (skipNonDigits, unsignedInt)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -23,25 +20,22 @@ type Input = (R, P)
 
 type OutputA = String
 
-type OutputB = Maybe Int
+type OutputB = Int
 
 ----------- PARSER -------------
 
+parseReg :: Parser Int
+parseReg = skipNonDigits *> unsignedInt
+
 inputParser :: Parser Input
-inputParser = do
-    _ <- string "Register A: "
-    a <- read <$> many1 digit
-    _ <- newline
-    _ <- string "Register B: "
-    b <- read <$> many1 digit
-    _ <- newline
-    _ <- string "Register C: "
-    c <- read <$> many1 digit
-    _ <- newline
-    _ <- newline
-    _ <- string "Program: "
-    p <- map read <$> many1 digit `sepBy` char ','
-    return (R a b c, p)
+inputParser =
+    (\a b c p -> (R a b c, p))
+        <$> parseReg
+        <*> parseReg
+        <*> parseReg
+        <*> ( skipNonDigits
+                *> (map read <$> many1 digit `sepBy` char ',')
+            )
 
 ----------- PART A&B -----------
 
@@ -115,28 +109,41 @@ chunks = [0 .. 7]
 combineA :: Int -> Int -> Int
 combineA a x = (a `shiftL` 3) .|. x
 
-isValid :: Int -> Int -> Bool
-isValid a outExpected = outActual == outExpected
+isValid :: [Ops] -> Int -> Int -> Bool
+isValid prog a outExpected = outActual == Just outExpected
   where
-    b' = (a .&. 7) `xor` 1
-    outActual = ((b' `xor` 5) `xor` (a `shiftR` b')) .&. 7
+    (_, _, outActual) =
+        foldl
+            ( \(r, ptr, output) op -> case runProgram op (r, ptr) of
+                Left (r', ptr') -> (r', ptr', output)
+                Right ((r', ptr'), out) -> (r', ptr', Just out)
+            )
+            (R a 0 0, 0, Nothing)
+            prog
 
-formulateA :: [Int] -> Int -> Maybe Int
-formulateA [] a = Just a
-formulateA prog a =
+formulateA :: (Int -> Int -> Bool) -> P -> Int -> Maybe Int
+formulateA _ [] a = Just a
+formulateA loopFunc gorp a =
     let
         testValues = map (combineA a) chunks
      in
-        check testValues (head prog)
+        check testValues (head gorp)
   where
     check :: [Int] -> Int -> Maybe Int
     check [] _ = Nothing
     check (t : ts) out =
-        if isValid t out
-            then case formulateA (tail prog) t of
+        if loopFunc t out
+            then case formulateA loopFunc (tail gorp) t of
                 Nothing -> check ts out
                 x -> x
             else check ts out
 
+genOps :: P -> [Ops]
+genOps [3, 0] = []
+genOps (x : y : rest) = (x, y) : genOps rest
+genOps _ = fail "Bad program: Program must end with 30"
+
 partB :: Input -> OutputB
-partB (_, prog) = formulateA (reverse prog) 0
+partB (_, prog) = case formulateA (isValid (genOps prog)) (reverse prog) 0 of
+    Nothing -> error "Failed: Program assumes one print per loop and A right shifted by 3 every loop (i.e. 03 in program)."
+    Just a -> a
