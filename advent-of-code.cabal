@@ -72,12 +72,15 @@ library
     , data-aviary
     , directory
     , extra >=1.8
+    , hashable
+    , heap
     , mtl
     , optparse-applicative
     , parsec
     , parser-combinators
     , text
     , time
+    , unordered-containers
     , vector
   default-language: Haskell2010
 
@@ -99,12 +102,15 @@ executable advent-of-code-exe
     , data-aviary
     , directory
     , extra >=1.8
+    , hashable
+    , heap
     , mtl
     , optparse-applicative
     , parsec
     , parser-combinators
     , text
     , time
+    , unordered-containers
     , vector
   default-language: Haskell2010
 
@@ -127,6 +133,8 @@ test-suite advent-of-code-test
     , data-aviary
     , directory
     , extra >=1.8
+    , hashable
+    , heap
     , hspec >=2.7
     , mtl
     , optparse-applicative
@@ -136,5 +144,6 @@ test-suite advent-of-code-test
     , regex-compat
     , text
     , time
+    , unordered-containers
     , vector
   default-language: Haskell2010
