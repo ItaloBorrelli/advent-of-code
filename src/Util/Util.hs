@@ -48,6 +48,11 @@ mapFromNestedLists = Map.fromList . attachCoords 0 0
     attachCoords x _ ([] : ls) = attachCoords (x + 1) 0 ls
     attachCoords x y ((l : ls) : lss) = ((x, y), l) : attachCoords x (y + 1) (ls : lss)
 
+-- Takes a nested list (to be thought of as a 2D structure).
+-- Returns a map from "co-ordinates" to the items in the list.
+-- For example:
+--     Input: [[a,b,c],[d,e]]
+--     Output: Map.fromList [((0,0),a), ((0,1),b), ((0,2),c), ((1,0),d), ((1,1),e)]
 mapFromNestedLists' :: [[a]] -> Map (Int, Int) a
 mapFromNestedLists' = Map.fromList . attachCoords 0 0
   where

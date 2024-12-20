@@ -6,13 +6,11 @@ module AOC.Y2024.Day20 (runDay) where
 import Data.Bifunctor (first, second)
 import Data.Heap (MinPrioHeap)
 import Data.Heap qualified as H
-import Data.Map.Strict (Map, (!), (!?))
+import Data.Map.Strict (Map, (!?))
 import Data.Map.Strict qualified as M
-import Data.Maybe (fromJust, fromMaybe)
+import Data.Maybe (fromJust, fromMaybe, mapMaybe)
 import Data.Set (Set)
 import Data.Set qualified as S
-import Data.Void (Void)
-import Debug.Trace (trace)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (char, eof, many, newline, sepBy, (<|>))
 import Text.Parsec.Text (Parser)
@@ -78,10 +76,6 @@ addDist :: (Num a) => Distance a -> Distance a -> Distance a
 addDist (Dist x) (Dist y) = Dist (x + y)
 addDist _ _ = Infinity
 
-subDist :: (Num a) => Distance a -> Distance a -> Distance a
-subDist (Dist x) (Dist y) = Dist (x - y)
-subDist _ _ = Dist 0
-
 (!??) :: (Ord k) => Map k (Distance d) -> k -> Distance d
 (!??) distanceMap key = fromMaybe Infinity (distanceMap !? key)
 
@@ -106,7 +100,7 @@ findShortestDistance graph src = processQueue initialState
     initialState = DijkstraState initialVisited initialDistances initialQueue
 
     processQueue :: DijkstraState -> Map C (Distance Int)
-    processQueue ds@(DijkstraState v0 d0 q0) = case H.view q0 of
+    processQueue ds@(DijkstraState {visitedSet = v0, distanceMap = d0, nodeQueue = q0}) = case H.view q0 of
         Nothing -> d0
         Just ((_, node), q1) ->
             if S.member node v0
@@ -148,37 +142,57 @@ constructEdges m c prev = foldl insertEdge prev moreEdges
     moreEdges = makeEdges c adjs
     insertEdge acc (k, v) = M.insertWith (++) k [v] acc
 
-cheats :: C -> [C]
-cheats c = [step U (step U c), step L (step L c), step R (step R c), step D (step D c)]
+manDist :: C -> C -> Int
+manDist (a0, a1) (b0, b1) = abs (b0 - a0) + abs (b1 - a1)
+
+manhattanDistanceCoords :: M -> C -> Int -> [(C, Int)]
+manhattanDistanceCoords m c@(a, b) x =
+    [ ((i, j), manDist (i, j) c)
+    | i <- [a - x .. a + x]
+    , j <- [b - x .. b + x]
+    , manDist (i, j) c <= x && m !? (i, j) == Just N
+    ]
 
 ----------- PART A -------------
 
-timeSaver :: M -> Map C (Distance Int) -> C -> Distance Int
-timeSaver m d0 c =
+timeSaver :: M -> Int -> Map C (Distance Int) -> C -> Int
+timeSaver m maxManDist d0 c =
     let
-        allSkips = filter (\c' -> m !? c' == Just N) $ cheats c
+        allSkips = manhattanDistanceCoords m c maxManDist
      in
-        maximum (Dist 0:map (\s -> subDist (d0 ! c) (fromMaybe Infinity (d0 !? s))) allSkips)
-
-partA :: Input -> Int
-partA (s, e, m) =
-    ( \m' ->
-            length $
-            filter
-                ( \(c, f) -> case f of
-                    Infinity -> False
-                    Dist h -> h >= 100
+        length $
+            map
+                Just
+                ( mapMaybe
+                    ( \(c', dist) -> case (d0 !? c, d0 !? c') of
+                        (_, Nothing) -> Nothing
+                        (Nothing, _) -> Nothing
+                        (Just a, Just b) -> case (a, b) of
+                            (_, Infinity) -> Nothing
+                            (Infinity, _) -> Nothing
+                            (Dist from, Dist to) -> if diff >= 100 then Just diff else Nothing
+                              where
+                                diff = to - (from + dist)
+                    )
+                    allSkips
                 )
-            $
-             map (\c -> (c, timeSaver m m' c)) (M.keys m')
-    )
-        $ (`findShortestDistance` s)
-        $ Graph
-        $ foldl (\m' k -> case m !? k of Just N -> constructEdges m k m'; _ -> m') M.empty ks
+
+partA :: Input -> OutputA
+partA (s, _, m) = sum $ map (timeSaver m 2 m') (M.keys m')
   where
     ks = M.keys m
+    m' =
+        (`findShortestDistance` s) $
+            Graph $
+                foldl (\m'' k -> case m !? k of Just N -> constructEdges m k m''; _ -> m'') M.empty ks
 
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB = error ""
+partB (s, _, m) = sum $ map (timeSaver m 20 m') (M.keys m')
+  where
+    ks = M.keys m
+    m' =
+        (`findShortestDistance` s) $
+            Graph $
+                foldl (\m'' k -> case m !? k of Just N -> constructEdges m k m''; _ -> m'') M.empty ks
