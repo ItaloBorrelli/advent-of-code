@@ -1,15 +1,15 @@
 module AOC.Y2024.Day19 (runDay) where
 
-import Data.Void (Void)
-import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (string, many, char, sepBy)
-import Text.Parsec.Text (Parser)
-import Text.Parsec.Char (anyChar, satisfy)
-import Text.Parsec (newline)
-import Data.List (stripPrefix)
-import Debug.Trace (trace)
-import Data.IntMap.Lazy qualified as M
 import Data.IntMap.Lazy (IntMap)
+import Data.IntMap.Lazy qualified as M
+import Data.List (stripPrefix)
+import Data.Maybe (fromMaybe)
+import Data.Void (Void)
+import Debug.Trace (trace)
+import Program.RunDay qualified as R (Day, runDay)
+import Text.Parsec (char, many, newline, sepBy, string)
+import Text.Parsec.Char (anyChar, satisfy)
+import Text.Parsec.Text (Parser)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -17,6 +17,7 @@ runDay = R.runDay inputParser partA partB
 ----------- TYPES --------------
 
 type T = String
+
 type P = String
 
 type Input = ([T], [P])
@@ -40,30 +41,39 @@ inputParser = do
 testPattern :: [T] -> [T] -> P -> Int
 testPattern _ _ [] = 1
 testPattern _ [] _ = 0
-testPattern allTs (t:ts) p = case stripPrefix t p of
+testPattern allTs (t : ts) p = case stripPrefix t p of
     Nothing -> testPattern allTs ts p
     Just rest -> testPattern allTs allTs rest + testPattern allTs ts p
 
 testPattern' :: [T] -> [T] -> P -> Bool
 testPattern' _ _ [] = True
 testPattern' _ [] _ = False
-testPattern' allTs (t:ts) p = case stripPrefix t p of
+testPattern' allTs (t : ts) p = case stripPrefix t p of
     Nothing -> testPattern' allTs ts p
     Just rest -> testPattern' allTs allTs rest || testPattern' allTs ts p
 
 type M = IntMap Int
 
+toChecks :: Int -> P -> [(Int, P)]
+toChecks _ [] = []
+toChecks idx p = (\x -> trace (show x) x) ((idx, p) : toChecks (idx + 1) (tail p))
+
 count :: [T] -> P -> Int
-count ts p = mFinal M.! (length p + 1)
-    where
-        mFinal = foldl foldTowel (M.empty :: M) [0..(length p)]
-        foldTowel :: M -> Int -> M
-        foldTowel m idx = foldl (\m' f -> f m') m $ map (\t -> if True then M.insertWith (+) (idx + length t) 1 else id) ts
-            where
-                x :: T -> (M -> M) -- TODO get pattern suffix to check
-                x t = case stripPrefix t p of
-                    Nothing -> id
-                    _ -> M.insertWith (+) (idx + length t) 1
+count ts ps = fromMaybe 0 (mFinal M.!? length ps)
+  where
+    mFinal = foldl foldTowel (M.empty :: M) (toChecks 0 ps)
+    foldTowel :: M -> (Int, P) -> M
+    foldTowel m idxPattern = foldl (test idxPattern) m ts
+      where
+        test :: (Int, P) -> M -> T -> M
+        test (idx, p) m' t =
+            if length t > length p
+                then m'
+                else case stripPrefix t p of
+                    Nothing -> m'
+                    _ -> M.insertWith (+) (idx + length t) x m
+          where
+            x = if idx == 0 then 1 else fromMaybe 0 (m' M.!? idx)
 
 ----------- PART A -------------
 
@@ -73,4 +83,4 @@ partA (ts, ps) = length $ filter id $ map (testPattern' ts ts) ps
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB (ts, ps) = sum $ map (testPattern ts ts) ps
+partB (ts, ps) = sum $ map (count ts) ps
