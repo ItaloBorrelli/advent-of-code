@@ -4,11 +4,10 @@ import Data.IntMap.Lazy (IntMap)
 import Data.IntMap.Lazy qualified as M
 import Data.List (stripPrefix)
 import Data.Maybe (fromMaybe)
-import Data.Void (Void)
-import Debug.Trace (trace)
+import Debug.Trace (trace, traceShow)
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec (char, many, newline, sepBy, string)
-import Text.Parsec.Char (anyChar, satisfy)
+import Text.Parsec (many, newline, sepBy, string)
+import Text.Parsec.Char (satisfy)
 import Text.Parsec.Text (Parser)
 
 runDay :: R.Day
@@ -51,19 +50,19 @@ slice :: [a] -> Int -> Int -> [a]
 slice ls i j = take j $ drop i ls
 
 count :: [T] -> P -> Int
-count ts ps = fromMaybe 0 (mFinal M.!? (length ps))
+count ts ps = fromMaybe 0 (mFinal M.!? length ps)
   where
-    mFinal = foldr foldTowel (M.singleton 0 1) [1 .. length ps + 1]
-    foldTowel :: Int -> M -> M
-    foldTowel idx m = foldl (testPattern idx) m ts
+    mFinal = foldl foldTowel (M.singleton 0 1) [1 .. length ps + 1]
+    foldTowel :: M -> Int -> M
+    foldTowel m idx = foldl (testPattern idx) m ts
       where
         testPattern :: Int -> M -> T -> M
         testPattern i m' t =
-            if length t <= i && slice ps (i - length t) i == t
-                then trace ( "in at: " ++ show (ps, t, i) )M.insertWith (+) (i) x m
+            if length t <= i && slice ps (i - length t) (length t) == t
+                then M.insertWith (+) i (fromMaybe 0 (m' M.!? (i - length t))) m'
                 else m'
           where
-            x = fromMaybe 0 (trace (show (i - length t)) m' M.!?  (i - length t))
+            x = fromMaybe 0 (m' M.!? (i - length t))
 
 ----------- PART A -------------
 
