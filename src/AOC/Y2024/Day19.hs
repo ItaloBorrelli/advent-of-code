@@ -4,7 +4,6 @@ import Data.IntMap.Lazy (IntMap)
 import Data.IntMap.Lazy qualified as M
 import Data.List (stripPrefix)
 import Data.Maybe (fromMaybe)
-import Debug.Trace (trace, traceShow)
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec (many, newline, sepBy, string)
 import Text.Parsec.Char (satisfy)
@@ -49,8 +48,8 @@ type M = IntMap Int
 slice :: [a] -> Int -> Int -> [a]
 slice ls i j = take j $ drop i ls
 
-count :: [T] -> P -> Int
-count ts ps = fromMaybe 0 (mFinal M.!? length ps)
+getPatternCount :: [T] -> P -> Int
+getPatternCount ts ps = fromMaybe 0 (mFinal M.!? length ps)
   where
     mFinal = foldl foldTowel (M.singleton 0 1) [1 .. length ps + 1]
     foldTowel :: M -> Int -> M
@@ -59,10 +58,10 @@ count ts ps = fromMaybe 0 (mFinal M.!? length ps)
         testPattern :: Int -> M -> T -> M
         testPattern i m' t =
             if length t <= i && slice ps (i - length t) (length t) == t
-                then M.insertWith (+) i (fromMaybe 0 (m' M.!? (i - length t))) m'
+                then M.insertWith (+) i insertVal m'
                 else m'
           where
-            x = fromMaybe 0 (m' M.!? (i - length t))
+            insertVal = fromMaybe 0 (m' M.!? (i - length t))
 
 ----------- PART A -------------
 
@@ -72,4 +71,4 @@ partA (ts, ps) = length $ filter id $ map (testPattern' ts ts) ps
 ----------- PART B -------------
 
 partB :: Input -> OutputB
-partB (ts, ps) = sum $ map (count ts) ps
+partB (ts, ps) = sum $ map (getPatternCount ts) ps
