@@ -38,13 +38,6 @@ inputParser = do
 
 ----------- PART A&B -----------
 
-testPattern :: [T] -> [T] -> P -> Int
-testPattern _ _ [] = 1
-testPattern _ [] _ = 0
-testPattern allTs (t : ts) p = case stripPrefix t p of
-    Nothing -> testPattern allTs ts p
-    Just rest -> testPattern allTs allTs rest + testPattern allTs ts p
-
 testPattern' :: [T] -> [T] -> P -> Bool
 testPattern' _ _ [] = True
 testPattern' _ [] _ = False
@@ -54,26 +47,23 @@ testPattern' allTs (t : ts) p = case stripPrefix t p of
 
 type M = IntMap Int
 
-toChecks :: Int -> P -> [(Int, P)]
-toChecks _ [] = []
-toChecks idx p = (\x -> trace (show x) x) ((idx, p) : toChecks (idx + 1) (tail p))
+slice :: [a] -> Int -> Int -> [a]
+slice ls i j = take j $ drop i ls
 
 count :: [T] -> P -> Int
-count ts ps = fromMaybe 0 (mFinal M.!? length ps)
+count ts ps = fromMaybe 0 (mFinal M.!? (length ps))
   where
-    mFinal = foldl foldTowel (M.empty :: M) (toChecks 0 ps)
-    foldTowel :: M -> (Int, P) -> M
-    foldTowel m idxPattern = foldl (test idxPattern) m ts
+    mFinal = foldr foldTowel (M.singleton 0 1) [1 .. length ps + 1]
+    foldTowel :: Int -> M -> M
+    foldTowel idx m = foldl (testPattern idx) m ts
       where
-        test :: (Int, P) -> M -> T -> M
-        test (idx, p) m' t =
-            if length t > length p
-                then m'
-                else case stripPrefix t p of
-                    Nothing -> m'
-                    _ -> M.insertWith (+) (idx + length t) x m
+        testPattern :: Int -> M -> T -> M
+        testPattern i m' t =
+            if length t <= i && slice ps (i - length t) i == t
+                then trace ( "in at: " ++ show (ps, t, i) )M.insertWith (+) (i) x m
+                else m'
           where
-            x = if idx == 0 then 1 else fromMaybe 0 (m' M.!? idx)
+            x = fromMaybe 0 (trace (show (i - length t)) m' M.!?  (i - length t))
 
 ----------- PART A -------------
 
