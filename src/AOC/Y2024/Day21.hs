@@ -6,11 +6,10 @@ import Data.Map.Lazy (Map, (!))
 import Data.Map.Lazy qualified as M
 import Data.Set (Set)
 import Data.Set qualified as S
-import Data.Void
-import Debug.Trace (trace)
+import Data.Void ()
 import Program.RunDay qualified as R (Day, runDay)
-import Text.Parsec
-import Text.Parsec.Text
+import Text.Parsec (char, digit, newline, sepBy)
+import Text.Parsec.Text (Parser)
 
 runDay :: R.Day
 runDay = R.runDay inputParser partA partB
@@ -19,18 +18,16 @@ runDay = R.runDay inputParser partA partB
 
 type Input = [(Char, Char, Char)]
 
-type OutputA = Input
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Int
 
 type C = (Int, Int)
-
-type A = Bool
 
 ----------- PARSER -------------
 
 inputParser :: Parser Input
-inputParser = ((\a b c -> (a, b, c)) <$> digit <*> digit <*> digit <* char 'A') `sepBy` newline
+inputParser = ((,,) <$> digit <*> digit <*> digit <* char 'A') `sepBy` newline
 
 ----------- PART A&B -----------
 
@@ -146,11 +143,11 @@ partA =
                     bot2 = reinstruct bot1
                     best = minimum $ S.map length bot2
                  in
-                    read [a, b, c] * (best -2 )
+                    read [a, b, c] * (best - 2)
             )
-            where
-                reinstruct :: SC -> SC
-                reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) x)
+  where
+    reinstruct :: SC -> SC
+    reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) x)
 
 ----------- PART B -------------
 
@@ -165,8 +162,8 @@ partB =
                     bot2 = reinstruct bot1
                     best = minimum $ S.map length (reinstruct bot2)
                  in
-                    read [a, b, c] * (best -2 )
+                    read [a, b, c] * (best - 2)
             )
-            where
-                reinstruct :: SC -> SC
-                reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) x)
+  where
+    reinstruct :: SC -> SC
+    reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) x)
