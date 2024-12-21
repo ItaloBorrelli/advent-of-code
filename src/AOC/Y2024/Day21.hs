@@ -1,7 +1,6 @@
 module AOC.Y2024.Day21 (runDay) where
 
 import Data.Bifunctor (first, second)
-import Data.List (permutations)
 import Data.Map.Lazy (Map, (!))
 import Data.Map.Lazy qualified as M
 import Data.Set (Set)
@@ -58,17 +57,8 @@ dirpad =
         ]
 {- FOURMOLU_ENABLE -}
 
-paths :: (Eq a, Ord a) => Map a C -> a -> a -> Set [Char]
+paths :: (Ord a) => Map a C -> a -> a -> Set [Char]
 paths m s t =
-    let
-        ((sx, sy), (tx, ty)) = (m ! s, m ! t)
-        h = replicate (abs (tx - sx)) (if tx > sx then '>' else '<')
-        v = replicate (abs (ty - sy)) (if ty > sy then 'v' else '^')
-     in
-        S.fromList (permutations (h ++ v))
-
-paths' :: (Eq a, Ord a) => Map a C -> a -> a -> Set [Char]
-paths' m s t =
     let
         ((sx, sy), (tx, ty)) = (m ! s, m ! t)
         h = replicate (abs (tx - sx)) (if tx > sx then '>' else '<')
@@ -91,33 +81,19 @@ filterPaths m badCoord (cs@(s, _), set) =
          in
             (c == badCoord) || badPath next xs
 
-numNav' :: Map (Char, Char) (Set [Char])
-numNav' =
-    let
-        ks = M.keys numpad
-     in
-        M.fromList [filterPaths numpad (0, 3) ((k0, k1), paths numpad k0 k1) | k0 <- ks, k1 <- ks]
-
-dirNav' :: Map (Char, Char) (Set [Char])
-dirNav' =
-    let
-        ks = M.keys dirpad
-     in
-        M.fromList [filterPaths dirpad (0, 0) ((k0, k1), paths dirpad k0 k1) | k0 <- ks, k1 <- ks]
-
 numNav :: Map (Char, Char) (Set [Char])
 numNav =
     let
         ks = M.keys numpad
      in
-        M.fromList [filterPaths numpad (0, 3) ((k0, k1), paths' numpad k0 k1) | k0 <- ks, k1 <- ks]
+        M.fromList [filterPaths numpad (0, 3) ((k0, k1), paths numpad k0 k1) | k0 <- ks, k1 <- ks]
 
 dirNav :: Map (Char, Char) SC
 dirNav =
     let
         ks = M.keys dirpad
      in
-        M.fromList [filterPaths dirpad (0, 0) ((k0, k1), paths' dirpad k0 k1) | k0 <- ks, k1 <- ks]
+        M.fromList [filterPaths dirpad (0, 0) ((k0, k1), paths dirpad k0 k1) | k0 <- ks, k1 <- ks]
 
 type SC = Set [Char]
 
@@ -127,43 +103,45 @@ joino a = S.foldr (\b acc -> S.union (S.map (++ b) a) acc) S.empty
 -- If rob0 is being instructed by rob1 to go from s to t what are the possible paths
 instructobot :: Map (Char, Char) SC -> [Char] -> SC
 instructobot m (s : t : rest) = joino (m ! (s, t)) (instructobot m (t : rest))
-instructobot m [s] = m ! (s, 'A')
-instructobot _ _ = S.empty
+instructobot _ _ = S.singleton ""
+
+best :: SC -> Int
+best = minimum . S.map length
+
+onlyBest :: SC -> SC
+onlyBest bot = S.filter (\x -> length x == best bot) bot
+
+reinstruct :: SC -> SC
+reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) (onlyBest x))
 
 ----------- PART A -------------
 
-partA :: Input -> Int
+partA :: Input -> OutputA
 partA =
     sum
         . map
             ( \(a, b, c) ->
                 let
-                    bot0 = instructobot numNav ('A' : [a, b, c])
+                    bot0 = instructobot numNav ['A', a, b, c, 'A']
                     bot1 = reinstruct bot0
                     bot2 = reinstruct bot1
-                    best = minimum $ S.map length bot2
+                    finalBest = best bot2
                  in
-                    read [a, b, c] * (best - 2)
+                    read [a, b, c] * finalBest
             )
-  where
-    reinstruct :: SC -> SC
-    reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) x)
 
 ----------- PART B -------------
 
-partB :: Input -> Int
+partB :: Input -> OutputB
 partB =
     sum
         . map
             ( \(a, b, c) ->
                 let
-                    bot0 = instructobot numNav ('A' : [a, b, c])
+                    bot0 = instructobot numNav ['A', a, b, c, 'A']
                     bot1 = reinstruct bot0
                     bot2 = reinstruct bot1
-                    best = minimum $ S.map length (reinstruct bot2)
+                    finalBest = best bot2
                  in
-                    read [a, b, c] * (best - 2)
+                    read [a, b, c] * finalBest
             )
-  where
-    reinstruct :: SC -> SC
-    reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) x)
