@@ -18,14 +18,14 @@ module Util.Util
     )
 where
 
-import Data.Map.Strict ( Map, keys, findWithDefault )
 import Data.Char (isDigit)
+import Data.Map.Strict (Map, findWithDefault, keys)
 import Data.Map.Strict qualified as Map
+import Data.String (IsString)
 import Debug.Trace (trace)
 import Text.Parsec (digit, satisfy, skipMany)
 import Text.Parsec.Text (Parser)
 import Text.ParserCombinators.Parsec (many)
-import Data.String (IsString)
 
 {-
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
