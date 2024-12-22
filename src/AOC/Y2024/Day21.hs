@@ -21,7 +21,13 @@ type OutputA = Int
 
 type OutputB = Int
 
-type C = (Int, Int)
+type Coordinate = (Int, Int)
+
+type PathSet = Set String
+
+data DirPad = DA | DR | DL | DU | DD deriving (Eq, Ord, Show)
+
+data NumPad = NA | N0 | N1 | N2 | N3 | N4 | N5 | N6 | N7 | N8 | N9 deriving (Eq, Ord, Show)
 
 ----------- PARSER -------------
 
@@ -30,7 +36,7 @@ inputParser = ((,,) <$> digit <*> digit <*> digit <* char 'A') `sepBy` newline
 
 ----------- PART A&B -----------
 
-numpad :: Map Char C
+numpad :: Map Char Coordinate
 numpad =
     M.fromList
 {- FOURMOLU_DISABLE -}
@@ -41,14 +47,14 @@ numpad =
         ]
 {- FOURMOLU_ENABLE -}
 
-go :: Char -> C -> C
+go :: Char -> Coordinate -> Coordinate
 go 'v' = second (1 +)
 go '^' = second (\y -> y - 1)
 go '>' = first (1 +)
 go '<' = first (\x -> x - 1)
 go _ = error "failure condition"
 
-dirpad :: Map Char C
+dirpad :: Map Char Coordinate
 dirpad =
     M.fromList
 {- FOURMOLU_DISABLE -}
@@ -57,7 +63,7 @@ dirpad =
         ]
 {- FOURMOLU_ENABLE -}
 
-paths :: (Ord a) => Map a C -> a -> a -> Set [Char]
+paths :: (Ord a) => Map a Coordinate -> a -> a -> PathSet
 paths m s t =
     let
         ((sx, sy), (tx, ty)) = (m ! s, m ! t)
@@ -66,14 +72,14 @@ paths m s t =
      in
         S.fromList [h ++ v ++ "A", v ++ h ++ "A"]
 
-filterPaths :: Map Char C -> C -> ((Char, Char), Set [Char]) -> ((Char, Char), Set [Char])
+filterPaths :: Map Char Coordinate -> Coordinate -> ((Char, Char), PathSet) -> ((Char, Char), PathSet)
 filterPaths m badCoord (cs@(s, _), set) =
     let
         start = m ! s
      in
         (cs, S.filter (not . badPath start) set)
   where
-    badPath :: C -> [Char] -> Bool
+    badPath :: Coordinate -> String -> Bool
     badPath _ [] = False
     badPath c (x : xs) =
         let
@@ -81,37 +87,36 @@ filterPaths m badCoord (cs@(s, _), set) =
          in
             (c == badCoord) || badPath next xs
 
-numNav :: Map (Char, Char) (Set [Char])
+numNav :: Map (Char, Char) PathSet
 numNav =
     let
         ks = M.keys numpad
      in
         M.fromList [filterPaths numpad (0, 3) ((k0, k1), paths numpad k0 k1) | k0 <- ks, k1 <- ks]
 
-dirNav :: Map (Char, Char) SC
+dirNav :: Map (Char, Char) PathSet
 dirNav =
     let
         ks = M.keys dirpad
      in
         M.fromList [filterPaths dirpad (0, 0) ((k0, k1), paths dirpad k0 k1) | k0 <- ks, k1 <- ks]
 
-type SC = Set [Char]
 
-joino :: SC -> SC -> SC
+joino :: PathSet -> PathSet -> PathSet
 joino a = S.foldr (\b acc -> S.union (S.map (++ b) a) acc) S.empty
 
 -- If rob0 is being instructed by rob1 to go from s to t what are the possible paths
-instructobot :: Map (Char, Char) SC -> [Char] -> SC
+instructobot :: Map (Char, Char) PathSet -> String -> PathSet
 instructobot m (s : t : rest) = joino (m ! (s, t)) (instructobot m (t : rest))
 instructobot _ _ = S.singleton ""
 
-best :: SC -> Int
-best = minimum . S.map length
+minPresses :: PathSet -> Int
+minPresses = minimum . S.map length
 
-onlyBest :: SC -> SC
-onlyBest bot = S.filter (\x -> length x == best bot) bot
+onlyBest :: PathSet -> PathSet
+onlyBest bot = S.filter (\x -> length x == minPresses bot) bot
 
-reinstruct :: SC -> SC
+reinstruct :: PathSet -> PathSet
 reinstruct x = S.unions (S.map (\y -> instructobot dirNav ('A' : y)) (onlyBest x))
 
 ----------- PART A -------------
@@ -125,7 +130,7 @@ partA =
                     bot0 = instructobot numNav ['A', a, b, c, 'A']
                     bot1 = reinstruct bot0
                     bot2 = reinstruct bot1
-                    finalBest = best bot2
+                    finalBest = minPresses bot2
                  in
                     read [a, b, c] * finalBest
             )
@@ -141,7 +146,7 @@ partB =
                     bot0 = instructobot numNav ['A', a, b, c, 'A']
                     bot1 = reinstruct bot0
                     bot2 = reinstruct bot1
-                    finalBest = best bot2
+                    finalBest = minPresses bot2
                  in
                     read [a, b, c] * finalBest
             )
