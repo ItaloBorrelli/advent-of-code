@@ -19,12 +19,12 @@ packages:
   original:
     hackage: ListZipper-1.2.0.2
 - completed:
-    hackage: hashable-1.4.7.0@sha256:573f3ab242f75465a0d67ce9d84202650a1606575e6dbd6d31ffcf4767a9a379,6629
+    hackage: hashable-1.4.4.0@sha256:ae22238274c572aa91e90c6c353e7206386708912ac5e6dc40ac61d1dcc553db,5216
     pantry-tree:
-      sha256: 9ec168505c52fa389b7447a1251b302e32537adeecac88c2aa72beed53beb3bd
-      size: 1578
+      sha256: cd91ec6f09475d2d0b2cf49565a488c21694be0d46bf29565f9258f5f41a3a84
+      size: 1249
   original:
-    hackage: hashable-1.4.7.0
+    hackage: hashable-1.4.4.0
 - completed:
     hackage: heap-1.0.4@sha256:d2492138714916700b2f66855f99f54bd51684c375121b73be114cafcbdb1504,1632
     pantry-tree:
