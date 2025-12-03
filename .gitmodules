@@ -1,6 +1,3 @@
-[submodule "advent-of-code-inputs"]
-	path = advent-of-code-inputs
-	url = ssh://git@git.turboteam.run:2222/ItaloBorrelli/advent-of-code-inputs.git
 [submodule "inputs"]
 	path = inputs
 	url = ssh://git@git.turboteam.run:2222/ItaloBorrelli/advent-of-code-inputs.git
