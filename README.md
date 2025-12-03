@@ -39,8 +39,8 @@ You can use the `aoc` script to initialize days, run tests with the test input a
 The day and year is resolved with the following precedence from highest:
 
 1. **Value set with flag parameters:** Use `-d ##` for the day and `-y ####` for the year.
-2. **Value set in `.env`:** The executable will try to source the `.env` file, which should `export` the `YEAR` and `DAY` variables if set.
-3. **Current day and year in EST (-5):** With no provded day and year, the current day and year will be used, which is  useful when doing the challenges on a daily basis in December.
+1. **Value set in `.env`:** The executable will try to source the `.env` file, which should `export` the `YEAR` and `DAY` variables if set.
+1. **Current day and year in EST (-5):** With no provded day and year, the current day and year will be used, which is useful when doing the challenges on a daily basis in December.
 
 Note that the day can be set with one method and year with the other.
 
@@ -50,11 +50,11 @@ Run `aoc -g` or `aoc --init` to generate the files for the day.
 
 This will:
 
-* Create `input.txt`, `test-answers.txt` and `test-input.txt` files in `inputs/$YEAR/$DAY`,
-* Copy a template day (`Day.hs.template`) as `src/AOC/Y${YEAR}/Day${Day}.hs`,
-* Add an import statement to `app/Main.hs`,
-* Add `Y${YEAR}Day${DAY}.runDay` and the default input file in `app/Main.hs`, and
-* Add a test entry to`test/Spec.hs`.
+- Create `input.txt`, `test-answers.txt` and `test-input.txt` files in `inputs/$YEAR/$DAY`,
+- Copy a template day (`Day.hs.template`) as `src/AOC/Y${YEAR}/Day${Day}.hs`,
+- Add an import statement to `app/Main.hs`,
+- Add `Y${YEAR}Day${DAY}.runDay` and the default input file in `app/Main.hs`, and
+- Add a test entry to`test/Spec.hs`.
 
 After that, run `stack build`. You can then put your inputs in the files and start working on the problem.
 
@@ -80,5 +80,5 @@ Adding the `-a` or `--all-days` flag runs every day.
 
 ## Other
 
-* `hie.yaml` was created with `gen-hie > hie.yaml`. First install `stack install implicit-hie`.
-* The `cabal` file is provided if you want to use `cabal` instead of `stack`.
+- `hie.yaml` was created with `gen-hie > hie.yaml`. First install `stack install implicit-hie`.
+- The `cabal` file is provided if you want to use `cabal` instead of `stack`.
