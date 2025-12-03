@@ -28,29 +28,49 @@ show_help() {
 get_all_flags() {
     while getopts "atgiry:d:h-:" opt; do
         case $opt in
-            a) ALL_DAYS=true;;
-            t) TEST=true;;
-            g) INIT=true;;
-            i) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
-            r) RUN=true;;
-            y) year="$OPTARG";;
-            d) day="$OPTARG";;
-            h) show_help; exit 0;;
-            -)
-                case "${OPTARG}" in
-                    all-days) ALL_DAYS=true;;
-                    init) INIT=true;;
-                    run) RUN=true;;
-                    test) TEST=true;;
-                    input) INPUT_FILE="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
-                    year)
-                        year="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
-                    day)
-                        day="${!OPTIND}"; OPTIND=$((OPTIND + 1));;
-                    help) show_help; exit 0;;
-                    *) echo "Unknown flag: -${OPTARG}";;
-                esac;;
-            *) show_help; exit 1;;
+        a) ALL_DAYS=true ;;
+        t) TEST=true ;;
+        g) INIT=true ;;
+        i)
+            INPUT_FILE="${!OPTIND}"
+            OPTIND=$((OPTIND + 1))
+            ;;
+        r) RUN=true ;;
+        y) year="$OPTARG" ;;
+        d) day="$OPTARG" ;;
+        h)
+            show_help
+            exit 0
+            ;;
+        -)
+            case "${OPTARG}" in
+            all-days) ALL_DAYS=true ;;
+            init) INIT=true ;;
+            run) RUN=true ;;
+            test) TEST=true ;;
+            input)
+                INPUT_FILE="${!OPTIND}"
+                OPTIND=$((OPTIND + 1))
+                ;;
+            year)
+                year="${!OPTIND}"
+                OPTIND=$((OPTIND + 1))
+                ;;
+            day)
+                day="${!OPTIND}"
+                OPTIND=$((OPTIND + 1))
+                ;;
+            help)
+                show_help
+                exit 0
+                ;;
+            *) echo "Unknown flag: -${OPTARG}" ;;
+            esac
+            ;;
+        *)
+            show_help
+            exit 1
+            ;;
         esac
     done
 }
@@ -109,7 +129,7 @@ if [ "$TEST" = true ]; then
             exit 1
         fi
         use_today_if_no_date
-        stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/" --progress-bar=none 
+        stack test --test-arguments="--match=/AoC/${YEAR}${DAY}/" --progress-bar=none
     else
         stack run -- --all-days
     fi
@@ -166,8 +186,8 @@ init() {
     TEST_ANSWER_FILE="$INPUT_DIR/$TEST_ANSWER_FILE_NAME"
     if [ ! -f $TEST_ANSWER_FILE ]; then
         touch $TEST_ANSWER_FILE
-        echo "Couldn't run Part A!" >> $TEST_ANSWER_FILE
-        echo "Couldn't run Part B!" >> $TEST_ANSWER_FILE
+        echo "Couldn't run Part A!" >>$TEST_ANSWER_FILE
+        echo "Couldn't run Part B!" >>$TEST_ANSWER_FILE
         echo "Created '$TEST_ANSWER_FILE_NAME' in '$INPUT_DIR'"
     fi
 
@@ -222,14 +242,6 @@ init() {
 
     echo
 
-    if [[ $PROMPT_VSCODE == true ]]; then
-        read -p "Open up files in VS Code immediately? (y/n) " confirm
-        if [[ $confirm == [yY] ]]; then
-            code "$TEST_ANSWER_FILE" "$TEST_INPUT_FILE" "$INPUT_FILE" "$SOLUTION_FILE"
-            echo
-        fi
-    fi
-
     echo "Done! Good luck!"
 
     echo
@@ -245,4 +257,3 @@ if [ "$INIT" = true ]; then
     use_today_if_no_date
     init
 fi
-

@@ -29,7 +29,7 @@ import AOC.Y2024.Day19 qualified as Y2024Day19
 import AOC.Y2024.Day20 qualified as Y2024Day20
 import AOC.Y2025.Day01 qualified as Y2025Day01
 import AOC.Y2025.Day02 qualified as Y2025Day02
-import AOC.Y2025.Day02 qualified as Y2025Day03
+import AOC.Y2025.Day03 qualified as Y2025Day03
 import Data.Map
     ( Map
     , fromList

@@ -1,5 +1,6 @@
 module AOC.Y2025.Day01 (runDay) where
 
+import Data.Bifunctor
 import Program.RunDay qualified as R (Day, runDay)
 import Text.Parsec
 import Text.Parsec.Text
@@ -12,6 +13,10 @@ runDay = R.runDay inputParser partA partB
 type Move = (Dir, Int)
 
 type Input = [Move]
+
+type P = Int
+
+type T = (Int, P)
 
 data Dir = L | R deriving (Show)
 
@@ -28,42 +33,31 @@ inputParser = readLine `sepEndBy` newline <* eof
 
 ----------- PART A&B -----------
 
+f :: P -> P
+f x = (100 - x) `mod` 100
+
 ----------- PART A -------------
 
-doMove :: (Int, Int) -> Move -> (Int, Int)
-doMove (x, pos) (L, n) =
+moveA :: T -> Move -> T
+moveA state (L, dist) = second f $ moveA (second f state) (R, dist)
+moveA (x, pos) (R, dist) =
     let
-        new_pos = (pos - n) `mod` 100
+        pos' = (pos + dist) `mod` 100
      in
-        if new_pos == 0 then (x + 1, new_pos) else (x, new_pos)
-doMove (x, pos) (R, n) =
-    let
-        new_pos = (pos + n) `mod` 100
-     in
-        if new_pos == 0 then (x + 1, new_pos) else (x, new_pos)
+        (if pos' == 0 then x + 1 else x, pos')
 
 partA :: Input -> OutputA
-partA = fst . foldl doMove (0, 50)
+partA = fst . foldl moveA (0, 50)
 
 ----------- PART B -------------
 
-doMove2 :: (Int, Int) -> Move -> (Int, Int)
-doMove2 (x, pos) (L, n)
-    | n == 0 = (x, pos)
-    | otherwise =
-        let
-            new_pos = (pos - n)
-            y = (pos - n) `mod` 100
-         in
-            if pos == 0
-                then (x + ((((new_pos - 1) `div` 100) * (-1)) - 1), y)
-                else if (pos - n) <= 0 then doMove2 (x + 1, 0) (L, n - pos) else (x, pos - n)
-doMove2 (x, pos) (R, n) =
+moveB :: T -> Move -> T
+moveB state (L, dist) = second f $ moveB (second f state) (R, dist)
+moveB (x, pos) (R, dist) =
     let
-        new_pos = (pos + n)
-        y = (pos + n) `mod` 100
+        pos' = (pos + dist)
      in
-        if new_pos >= 100 then (x + (new_pos `div` 100), y) else (x, y)
+        (x + (pos' `div` 100), pos' `mod` 100)
 
 partB :: Input -> OutputB
-partB = fst . foldl doMove2 (0, 50)
+partB = fst . foldl moveB (0, 50)

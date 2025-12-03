@@ -1,15 +1,13 @@
-name:                advent-of-code
-version:             0.1.0.0
-github:              "ItaloBorrelli/advent-of-code"
-license:             BSD-3-Clause
-author:              "ItaloBorrelli"
-maintainer:          "iborrelli@protonmail.com"
-copyright:           "2024 Italo Borrelli"
-
+name: advent-of-code
+version: 0.1.0.0
+github: "ItaloBorrelli/advent-of-code"
+license: BSD-3-Clause
+author: "ItaloBorrelli"
+maintainer: "iborrelli@protonmail.com"
+copyright: "2024 Italo Borrelli"
 extra-source-files:
-- README.md
-- CHANGELOG.md
-
+  - README.md
+  - CHANGELOG.md
 # Metadata used when publishing your package
 # synopsis:            Short description of your package
 # category:            Web
@@ -17,38 +15,35 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Please see the README on GitHub at <https://github.com/ItaloBorrelli/advent-of-code#readme>
-
+description: Please see the README on GitHub at <https://github.com/ItaloBorrelli/advent-of-code#readme>
 dependencies:
-- base >= 4.7 && < 5
-- extra >= 1.8
-- time
-- ansi-terminal
-- directory
-- optparse-applicative
-- parser-combinators
-- parsec
-- containers
-- text
-- mtl
-- vector
-- data-aviary
-- ListZipper
-- unordered-containers
-- hashable
-- heap
-
+  - base >= 4.7 && < 5
+  - extra >= 1.8
+  - time
+  - ansi-terminal
+  - directory
+  - optparse-applicative
+  - parser-combinators
+  - parsec
+  - containers
+  - text
+  - mtl
+  - vector
+  - data-aviary
+  - ListZipper
+  - unordered-containers
+  - hashable
+  - heap
 ghc-options:
-- -Wall
-- -Wcompat
-- -Widentities
-- -Wincomplete-record-updates
-- -Wincomplete-uni-patterns
-- -Wmissing-export-lists
-- -Wmissing-home-modules
-- -Wpartial-fields
-- -Wredundant-constraints
-
+  - -Wall
+  - -Wcompat
+  - -Widentities
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wmissing-export-lists
+  - -Wmissing-home-modules
+  - -Wpartial-fields
+  - -Wredundant-constraints
 library:
   source-dirs: src
   default-extensions:
@@ -59,35 +54,42 @@ library:
     - OverloadedStrings
     - GADTs
     - GHC2021
-
 executables:
   advent-of-code-exe:
-    main:                Main.hs
-    source-dirs:         app
+    main: Main.hs
+    source-dirs: app
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
     dependencies:
-    - advent-of-code
-
+      - advent-of-code
+  advent-of-code-today-exe:
+    main: Today.hs
+    source-dirs: app-today
+    ghc-options:
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N
+    dependencies:
+      - advent-of-code
 tests:
   advent-of-code-test:
-    main:                Spec.hs
-    source-dirs:         test
+    main: Spec.hs
+    source-dirs: test
     ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N4
-    - -with-rtsopts=-qa
-    - -with-rtsopts=-C0
-    - -funfolding-use-threshold=16
-    - -fexcess-precision
-    - -optc-O3
-    - -optc-ffast-math
-    - -O2
+      - -threaded
+      - -rtsopts
+      - -with-rtsopts=-N4
+      - -with-rtsopts=-qa
+      - -with-rtsopts=-C0
+      - -funfolding-use-threshold=16
+      - -fexcess-precision
+      - -optc-O3
+      - -optc-ffast-math
+      - -O2
     dependencies:
-    - advent-of-code
-    - process
-    - hspec >= 2.7
-    - regex-compat
+      - advent-of-code
+      - process
+      - hspec >= 2.7
+      - regex-compat

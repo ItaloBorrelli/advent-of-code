@@ -6,6 +6,9 @@ cradle:
     - path: "./app/Main.hs"
       component: "advent-of-code:exe:advent-of-code-exe"
 
+    - path: "./app-today/Today.hs"
+      component: "advent-of-code:exe:advent-of-code-today-exe"
+
     - path: "./test"
       component: "advent-of-code:test:advent-of-code-test"
 
