@@ -48,6 +48,7 @@ library
       AOC.Y2025.Day01
       AOC.Y2025.Day02
       AOC.Y2025.Day03
+      AOC.Y2025.Day04
       Program.Color
       Program.RunDay
       Util.Days
