@@ -1,6 +1,6 @@
 cabal-version: 2.2
 
--- This file has been generated from package.yaml by hpack version 0.37.0.
+-- This file has been generated from package.yaml by hpack version 0.38.1.
 --
 -- see: https://github.com/sol/hpack
 
@@ -25,30 +25,7 @@ source-repository head
 
 library
   exposed-modules:
-      AOC.Y2022.Day01
-      AOC.Y2022.Day02
-      AOC.Y2024.Day01
-      AOC.Y2024.Day02
-      AOC.Y2024.Day03
-      AOC.Y2024.Day04
-      AOC.Y2024.Day05
-      AOC.Y2024.Day06
-      AOC.Y2024.Day07
-      AOC.Y2024.Day08
-      AOC.Y2024.Day09
-      AOC.Y2024.Day10
-      AOC.Y2024.Day11
-      AOC.Y2024.Day12
-      AOC.Y2024.Day13
-      AOC.Y2024.Day14
-      AOC.Y2024.Day15
-      AOC.Y2024.Day17
-      AOC.Y2024.Day19
-      AOC.Y2024.Day20
-      AOC.Y2025.Day01
-      AOC.Y2025.Day02
-      AOC.Y2025.Day03
-      AOC.Y2025.Day04
+      AOC.Y2025.Day05
       Program.Color
       Program.RunDay
       Util.Days

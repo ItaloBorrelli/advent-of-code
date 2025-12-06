@@ -31,6 +31,7 @@ import AOC.Y2025.Day01 qualified as Y2025Day01
 import AOC.Y2025.Day02 qualified as Y2025Day02
 import AOC.Y2025.Day03 qualified as Y2025Day03
 import AOC.Y2025.Day04 qualified as Y2025Day04
+import AOC.Y2025.Day05 qualified as Y2025Day05
 import Data.Map
     ( Map
     , fromList
@@ -67,6 +68,7 @@ days =
       (202501, (Y2025Day01.runDay, "inputs/2025/01/input.txt")),
       (202502, (Y2025Day02.runDay, "inputs/2025/02/input.txt")),
       (202503, (Y2025Day03.runDay, "inputs/2025/03/input.txt")),
-      (202504, (Y2025Day04.runDay, "inputs/2025/04/input.txt"))
+      (202504, (Y2025Day04.runDay, "inputs/2025/04/input.txt")),
+      (202505, (Y2025Day05.runDay, "inputs/2025/05/input.txt"))
     ]
 {- FOURMOLU_ENABLE -}

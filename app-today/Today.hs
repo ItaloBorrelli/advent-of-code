@@ -7,7 +7,7 @@
 
 -- Data Output
 
-import AOC.Y2025.Day04 qualified as Y2025Day04
+import AOC.Y2025.Day05 qualified as Y2025Day05
 import Control.Applicative.Combinators qualified as C (option)
 import Data.Maybe (fromMaybe)
 import Options.Applicative
@@ -87,7 +87,7 @@ formatDay d = printf "\n***Year %s Day %02d***" (take 4 (show d)) (d `mod` 100)
 
 days :: (Int, Day, String)
 days =
-    (4, Y2025Day04.runDay, "inputs/2025/04/input.txt")
+    (5, Y2025Day05.runDay, "inputs/2025/05/input.txt")
 
 performDay :: Options -> IO ()
 performDay (Options (OneDay {..}) v) =
